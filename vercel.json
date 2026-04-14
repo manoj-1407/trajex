@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "dest": "https://BACKEND_URL_PLACEHOLDER.railway.app/api/$1" }
+  ]
+}

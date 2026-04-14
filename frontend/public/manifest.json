@@ -1,0 +1,19 @@
+{
+  "name": "Trajex",
+  "short_name": "Trajex",
+  "description": "Dispatch intelligence for local delivery businesses",
+  "start_url": "/my-deliveries",
+  "display": "standalone",
+  "background_color": "#07070f",
+  "theme_color": "#00e5cc",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": [],
+  "shortcuts": [
+    { "name": "New Order", "url": "/orders?action=new", "icons": [] },
+    { "name": "Live Map", "url": "/live-map", "icons": [] }
+  ]
+}

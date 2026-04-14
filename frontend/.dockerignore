@@ -1,0 +1,9 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+build_log*.txt
+README.md
+Docker*
+docker-compose*

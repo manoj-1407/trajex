@@ -1,0 +1,26 @@
+{
+  "name": "trajex",
+  "version": "1.0.0",
+  "description": "Multi-tenant delivery dispatch platform with real-time tracking, PostgreSQL RLS tenant isolation, and JWT auth.",
+  "private": true,
+  "author": "Manoj Kumar <manojkumar148700@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manoj-1407/trajex.git"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "npm run dev:backend & npm run dev:frontend",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "test:backend": "cd backend && npm test",
+    "docker:up": "docker-compose --env-file .env.docker up --build",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

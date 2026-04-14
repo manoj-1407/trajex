@@ -1,0 +1,64 @@
+{
+  "name": "trajex-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Express/PostgreSQL backend for Trajex — multi-tenant dispatch API with RLS, JWT, and Socket.io.",
+  "author": "Manoj Kumar <manojkumar148700@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manoj-1407/trajex.git"
+  },
+  "keywords": ["delivery", "dispatch", "saas", "multi-tenant", "postgresql", "rls", "socket.io"],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "seed": "node seed.js",
+    "lint": "eslint src/",
+    "test": "jest --runInBand --forceExit",
+    "migrate:up": "node-pg-migrate up",
+    "migrate:down": "node-pg-migrate down",
+    "migrate:create": "node-pg-migrate create"
+  },
+  "dependencies": {
+    "axios": "^1.14.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-rate-limit": "^7.2.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-pg-migrate": "^8.0.4",
+    "nodemailer": "^6.9.13",
+    "pino": "^9.1.0",
+    "pino-http": "^10.2.0",
+    "socket.io": "^4.7.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.3.0",
+    "eslint": "^8.57.0",
+    "jest": "^30.3.0",
+    "nodemon": "^3.1.0",
+    "pg": "^8.20.0",
+    "pino-pretty": "^11.0.0",
+    "socket.io-client": "^4.8.3",
+    "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "globalSetup": "./tests/globalSetup.js",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "testTimeout": 20000,
+    "verbose": true
+  }
+}
