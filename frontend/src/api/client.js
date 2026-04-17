@@ -29,7 +29,7 @@ function toCamel(obj) {
 }
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '/api/v1',
   withCredentials: true,
   timeout: 15000,
 });
@@ -71,7 +71,7 @@ api.interceptors.response.use(
       original._retry = true;
       isRefreshing = true;
       try {
-        const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
+        const baseURL = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '/api/v1';
         const { data } = await axios.post(`${baseURL}/auth/refresh`, {}, { withCredentials: true });
         const store = await getAuthStore();
         store.getState().setToken(data.accessToken);
