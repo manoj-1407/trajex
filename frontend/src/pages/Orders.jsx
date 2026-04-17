@@ -64,15 +64,15 @@ export default function Orders() {
     if (filters.status !== 'all' && o.status !== filters.status) return false;
     if (filters.search) {
       const q = filters.search.toLowerCase();
-      return o.customer_name?.toLowerCase().includes(q) || 
+      return o.customerName?.toLowerCase().includes(q) || 
              o.id.toLowerCase().includes(q) || 
-             o.drop_address?.toLowerCase().includes(q);
+             o.dropAddress?.toLowerCase().includes(q);
     }
     return true;
   });
 
   const handleCopyLink = (order) => {
-    navigator.clipboard.writeText(`${window.location.origin}/track/${order.tracking_token}`);
+    navigator.clipboard.writeText(`${window.location.origin}/track/${order.trackingToken}`);
     toast.success('Tracking link copied');
   };
 
@@ -259,26 +259,26 @@ export default function Orders() {
             <div className="grid-auto">
               <div className="glass-card" style={{ padding: '20px' }}>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 600 }}>Customer Details</div>
-                <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{detailModal.customer_name}</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{detailModal.customer_phone}</div>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>{detailModal.customerName}</div>
+                <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{detailModal.customerPhone}</div>
               </div>
               <div className="glass-card" style={{ padding: '20px' }}>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 600 }}>Delivery Address</div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <MapPin size={16} color="var(--accent)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{detailModal.drop_address}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{detailModal.dropAddress}</div>
                 </div>
               </div>
             </div>
 
-            {detailModal.rider_name && (
+            {detailModal.riderName && (
               <div className="glass-card" style={{ padding: '20px' }}>
                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px', fontWeight: 600 }}>Assigned Rider</div>
                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--info-dim)', color: 'var(--info)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>{detailModal.rider_name.substring(0,2).toUpperCase()}</div>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--info-dim)', color: 'var(--info)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>{detailModal.riderName.substring(0,2).toUpperCase()}</div>
                     <div>
-                       <div style={{ fontSize: '14px', fontWeight: 600 }}>{detailModal.rider_name}</div>
-                       <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{detailModal.rider_phone || '—'}</div>
+                       <div style={{ fontSize: '14px', fontWeight: 600 }}>{detailModal.riderName}</div>
+                       <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{detailModal.riderPhone || '—'}</div>
                     </div>
                  </div>
               </div>
@@ -305,7 +305,7 @@ export default function Orders() {
                     </div>
                     <div style={{ paddingTop: '6px' }}>
                        <div style={{ fontSize: '15px', fontWeight: 600, color: reached ? 'var(--text-primary)' : 'var(--text-muted)' }}>{st.label}</div>
-                       <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{reached ? formatTimeAgo(detailModal.updated_at) : '—'}</div>
+                       <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{reached ? formatTimeAgo(detailModal.updatedAt) : '—'}</div>
                     </div>
                   </div>
                 )
@@ -393,7 +393,7 @@ export default function Orders() {
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--accent)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>
                     ID: {o.id.substring(0, 10).toUpperCase()}
                   </div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>{o.customer_name}</h3>
+                  <h3 style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>{o.customerName}</h3>
                 </div>
                 <Badge status={o.status} size="sm" />
               </div>
@@ -403,18 +403,18 @@ export default function Orders() {
                   <MapPin size={16} color="var(--text-secondary)" />
                 </div>
                 <div className="truncate-2" style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                  {o.drop_address}
+                  {o.dropAddress}
                 </div>
               </div>
 
               <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {o.rider_name ? (
+                  {o.riderName ? (
                     <>
                       <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--accent-dim)', color: 'var(--accent)', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>
-                        {o.rider_name.charAt(0)}
+                        {o.riderName.charAt(0)}
                       </div>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>{o.rider_name}</span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>{o.riderName}</span>
                     </>
                   ) : (
                     <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>UNASSIGNED</span>
@@ -422,7 +422,7 @@ export default function Orders() {
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700 }}>
                   <Clock size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                  {formatTimeAgo(o.created_at)}
+                  {formatTimeAgo(o.createdAt)}
                 </div>
               </div>
             </motion.div>

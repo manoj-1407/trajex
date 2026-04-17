@@ -210,11 +210,11 @@ export default function Riders() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', background: 'var(--bg-surface)', padding: '16px', borderRadius: '14px', border: '1px solid var(--border-subtle)' }}>
                   <div>
                     <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 800, letterSpacing: '0.05em' }}>Current Load</div>
-                    <div style={{ fontSize: '16px', fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{r.active_orders} ORDERS</div>
+                    <div style={{ fontSize: '16px', fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{r.activeOrders} ORDERS</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', fontWeight: 800, letterSpacing: '0.05em' }}>Trust Score</div>
-                    <StarRating score={r.reliability_score || 85} />
+                    <StarRating score={r.reliabilityScore || 85} />
                   </div>
                 </div>
               </div>
@@ -274,11 +274,11 @@ export default function Riders() {
                   <div className="glass-card" style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
                     <div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>RELIABILITY</div>
-                      <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{detailPanel.reliability_score || 85}%</div>
+                      <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{detailPanel.reliabilityScore || 85}%</div>
                     </div>
                     <div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ACTIVE</div>
-                      <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>{detailPanel.active_orders}</div>
+                      <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--accent)' }}>{detailPanel.activeOrders}</div>
                     </div>
                   </div>
                 </div>

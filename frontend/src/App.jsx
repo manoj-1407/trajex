@@ -37,8 +37,19 @@ const Settings = React.lazy(() => import('./pages/Settings'));
 const Onboarding = React.lazy(() => import('./pages/Onboarding'));
 
 function ProtectedRoute({ children }) {
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const { isAuthenticated, user } = useAuthStore(state => ({ 
+    isAuthenticated: state.isAuthenticated, 
+    user: state.user 
+  }));
+  const location = useLocation();
+
   if (!isAuthenticated) return <Navigate to="/login" />;
+
+  // Force redirection to settings if password change is mandatory
+  if (user?.mustChangePassword && location.pathname !== '/settings') {
+    return <Navigate to="/settings?force_password_change=true" />;
+  }
+
   return children;
 }
 

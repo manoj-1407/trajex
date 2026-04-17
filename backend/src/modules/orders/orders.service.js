@@ -23,7 +23,29 @@ async function getOrders(businessId, { status, page, limit, search, riderId } = 
     params.push(safeLimit); params.push((safePage - 1) * safeLimit);
     const result = await db.queryForTenant(
         businessId,
-        'SELECT o.id, o.customer_name, o.customer_phone, o.status, o.priority, o.drop_address, o.total_amount, o.tracking_token, o.is_delayed, o.expected_delivery_at, o.created_at, o.updated_at, o.rider_id, dp.name AS rider_name, dp.phone AS rider_phone, s.name AS store_name FROM orders o LEFT JOIN delivery_partners dp ON dp.id = o.rider_id LEFT JOIN stores s ON s.id = o.store_id ' + where + ' ORDER BY o.created_at DESC LIMIT $' + (params.length - 1) + ' OFFSET $' + params.length,
+        `SELECT 
+            o.id, 
+            o.customer_name AS "customerName", 
+            o.customer_phone AS "customerPhone", 
+            o.status, 
+            o.priority, 
+            o.drop_address AS "dropAddress", 
+            o.total_amount AS "totalAmount", 
+            o.tracking_token AS "trackingToken", 
+            o.is_delayed AS "isDelayed", 
+            o.expected_delivery_at AS "expectedDeliveryAt", 
+            o.created_at AS "createdAt", 
+            o.updated_at AS "updatedAt", 
+            o.rider_id AS "riderId", 
+            dp.name AS "riderName", 
+            dp.phone AS "riderPhone", 
+            s.name AS "storeName" 
+         FROM orders o 
+         LEFT JOIN delivery_partners dp ON dp.id = o.rider_id 
+         LEFT JOIN stores s ON s.id = o.store_id 
+         ${where} 
+         ORDER BY o.created_at DESC 
+         LIMIT $${params.length - 1} OFFSET $${params.length}`,
         params
     );
     return { orders: result.rows, total, page: safePage, limit: safeLimit, pages: Math.ceil(total / safeLimit) };
@@ -32,12 +54,38 @@ async function getOrders(businessId, { status, page, limit, search, riderId } = 
 async function getOrder(businessId, orderId) {
     const result = await db.queryForTenant(
         businessId,
-        'SELECT o.*, dp.name AS rider_name, dp.phone AS rider_phone, dp.vehicle_type, s.name AS store_name, s.address AS store_address FROM orders o LEFT JOIN delivery_partners dp ON dp.id = o.rider_id LEFT JOIN stores s ON s.id = o.store_id WHERE o.id = $1 AND o.business_id = $2',
+        `SELECT 
+            o.id, 
+            o.customer_name AS "customerName", 
+            o.customer_phone AS "customerPhone", 
+            o.channel, 
+            o.status, 
+            o.pickup_lat AS "pickupLat", 
+            o.pickup_lng AS "pickupLng", 
+            o.drop_lat AS "dropLat", 
+            o.drop_lng AS "dropLng", 
+            o.drop_address AS "dropAddress", 
+            o.priority, 
+            o.sla_minutes AS "slaMinutes", 
+            o.expected_delivery_at AS "expectedDeliveryAt", 
+            o.total_amount AS "totalAmount", 
+            o.notes, 
+            o.created_at AS "createdAt",
+            o.updated_at AS "updatedAt",
+            dp.name AS "riderName", 
+            dp.phone AS "riderPhone", 
+            dp.vehicle_type AS "vehicleType", 
+            s.name AS "storeName", 
+            s.address AS "storeAddress" 
+         FROM orders o 
+         LEFT JOIN delivery_partners dp ON dp.id = o.rider_id 
+         LEFT JOIN stores s ON s.id = o.store_id 
+         WHERE o.id = $1 AND o.business_id = $2`,
         [orderId, businessId]
     );
     if (result.rows.length === 0) return null;
-    const items  = await db.queryForTenant(businessId, 'SELECT * FROM order_items WHERE order_id = $1 ORDER BY id', [orderId]);
-    const events = await db.queryForTenant(businessId, 'SELECT te.*, dp.name AS rider_name FROM tracking_events te LEFT JOIN delivery_partners dp ON dp.id = te.rider_id WHERE te.order_id = $1 ORDER BY te.created_at ASC', [orderId]);
+    const items  = await db.queryForTenant(businessId, 'SELECT id, product_id AS "productId", name, qty, price, tax FROM order_items WHERE order_id = $1 ORDER BY id', [orderId]);
+    const events = await db.queryForTenant(businessId, 'SELECT te.id, te.type, te.notes, te.created_at AS "createdAt", dp.name AS "riderName" FROM tracking_events te LEFT JOIN delivery_partners dp ON dp.id = te.rider_id WHERE te.order_id = $1 ORDER BY te.created_at ASC', [orderId]);
     return { ...result.rows[0], items: items.rows, tracking: events.rows };
 }
 
@@ -48,7 +96,15 @@ async function createOrder(businessId, userId, data) {
     const expectedAt = new Date(Date.now() + sla * 60 * 1000);
     const order = await db.withTenantTransaction(businessId, async (client) => {
         const orderRes = await client.query(
-            'INSERT INTO orders (business_id, store_id, customer_name, customer_phone, channel, pickup_lat, pickup_lng, drop_lat, drop_lng, drop_address, priority, sla_minutes, expected_delivery_at, tracking_token, notes, total_amount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *',
+            `INSERT INTO orders (business_id, store_id, customer_name, customer_phone, channel, pickup_lat, pickup_lng, drop_lat, drop_lng, drop_address, priority, sla_minutes, expected_delivery_at, tracking_token, notes, total_amount) 
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) 
+             RETURNING 
+                id, 
+                customer_name AS "customerName", 
+                customer_phone AS "customerPhone", 
+                status, 
+                expected_delivery_at AS "expectedDeliveryAt", 
+                total_amount AS "totalAmount"`,
             [businessId, storeId || null, customerName, customerPhone || null, channel || 'manual', pickupLat || null, pickupLng || null, dropLat || null, dropLng || null, dropAddress || null, priority || 'normal', sla, expectedAt, token, notes || null, items.reduce((sum, i) => sum + (i.price || 0) * (i.qty || 1), 0)]
         );
         const orderObj = orderRes.rows[0];
@@ -109,7 +165,7 @@ async function assignRider(businessId, orderId, riderId, actorId, io) {
     const riderRes = await db.queryForTenant(businessId, 'SELECT * FROM delivery_partners WHERE id = $1 AND business_id = $2 AND is_active = TRUE', [riderId, businessId]);
     if (riderRes.rows.length === 0) return { error: 'Rider not found' };
     const result = await db.withTenantTransaction(businessId, async (client) => {
-        const updated = await client.query('UPDATE orders SET rider_id = $1, status = $2 WHERE id = $3 AND business_id = $4 RETURNING *', [riderId, 'assigned', orderId, businessId]);
+        const updated = await client.query('UPDATE orders SET rider_id = $1, status = $2 WHERE id = $3 AND business_id = $4 RETURNING id, rider_id AS "riderId", status', [riderId, 'assigned', orderId, businessId]);
         await client.query('UPDATE delivery_partners SET active_orders = active_orders + 1, status = $1 WHERE id = $2', ['busy', riderId]);
         await client.query('INSERT INTO tracking_events (order_id, rider_id, type, actor_id) VALUES ($1,$2,$3,$4)', [orderId, riderId, 'rider_assigned', actorId]);
         return updated.rows[0];

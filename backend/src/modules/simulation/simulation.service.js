@@ -4,7 +4,11 @@ const logger = require('../../config/logger');
 
 let _io = null;
 let _simulationInterval = null;
-let _activeSimulations = new Map(); // businessId -> { riders, orders }
+let _activeSimulations = new Map(); // businessId -> { riders, status }
+
+// HYDERABAD HUB (HITEC City / Gachibowli Area)
+const CITY_CENTER = { lat: 17.4483, lng: 78.3915 };
+const MOVEMENT_SPEED = 0.0005; // Base movement step
 
 function setIo(io) {
     _io = io;
@@ -16,26 +20,30 @@ function setIo(io) {
 async function startChaos(businessId) {
     if (_activeSimulations.has(businessId)) return { message: 'Simulation already active' };
 
-    logger.info({ businessId }, 'Initializing Rush Hour Simulation');
+    logger.info({ businessId }, 'Initializing Rush Hour Simulation (Hyderabad Hub)');
 
     // 1. Create 5 Elite Riders
     const riders = [];
     const names = ['UNIT-ALPHA', 'UNIT-BRAVO', 'UNIT-KILO', 'UNIT-DELTA', 'UNIT-ZULU'];
     
-    // Base coords for Simulation (Central Park, NYC area)
-    const baseLat = 40.785091;
-    const baseLng = -73.968285;
-
     for (const name of names) {
         const res = await db.query(
             `INSERT INTO delivery_partners (business_id, name, phone, status, last_lat, last_lng, reliability_score) 
              VALUES ($1, $2, $3, 'available', $4, $5, $6) RETURNING *`,
-            [businessId, name, '+1555000' + Math.floor(Math.random() * 9000), baseLat + (Math.random() - 0.5) * 0.02, baseLng + (Math.random() - 0.5) * 0.02, 4.8 + Math.random() * 0.2]
+            [
+                businessId, 
+                name, 
+                '+919000' + Math.floor(Math.random() * 90000), 
+                'available', 
+                CITY_CENTER.lat + (Math.random() - 0.5) * 0.04, 
+                CITY_CENTER.lng + (Math.random() - 0.5) * 0.04, 
+                4.8 + Math.random() * 0.2
+            ]
         );
         riders.push(res.rows[0]);
     }
 
-    // 2. Create 10 Pending Orders
+    // 2. Create 10 Pending Orders across Hyderabad
     for (let i = 0; i < 10; i++) {
         const clients = [
             'Aether Strategic Corp', 'Hyperion Dynamics', 'Nebula Industries', 
@@ -49,12 +57,12 @@ async function startChaos(businessId) {
             [
                 businessId, 
                 clients[i] || `Enterprise Partner ${100 + i}`, 
-                '+1555999' + Math.floor(Math.random()*9000), 
+                '+91888' + Math.floor(Math.random()*90000), 
                 'Strategic Sector ' + String.fromCharCode(65 + i),
-                baseLat + (Math.random() - 0.5) * 0.01,
-                baseLng + (Math.random() - 0.5) * 0.01,
-                baseLat + (Math.random() - 0.5) * 0.05,
-                baseLng + (Math.random() - 0.5) * 0.05,
+                CITY_CENTER.lat + (Math.random() - 0.5) * 0.02,
+                CITY_CENTER.lng + (Math.random() - 0.5) * 0.02,
+                CITY_CENTER.lat + (Math.random() - 0.5) * 0.08,
+                CITY_CENTER.lng + (Math.random() - 0.5) * 0.08,
                 crypto.randomBytes(16).toString('hex')
             ]
         );
@@ -67,18 +75,24 @@ async function startChaos(businessId) {
         _simulationInterval = setInterval(moveSimulatedRiders, 3000);
     }
 
-    return { message: 'Chaos engine engaged', ridersCreated: riders.length };
+    return { message: 'Chaos engine engaged in Hyderabad Hub', ridersCreated: riders.length };
 }
 
 async function moveSimulatedRiders() {
     for (const [bizId, sim] of _activeSimulations.entries()) {
         for (const rider of sim.riders) {
-            // Random jitter movement
-            rider.last_lat += (Math.random() - 0.5) * 0.002;
-            rider.last_lng += (Math.random() - 0.5) * 0.002;
+            // Intelligent Movement: Identify target (currently random jitter, but aligned with region)
+            // In a full implementation, we would query assigned orders here.
+            // For now, we simulate 'patrol' movement in Hyderabad.
+            const jitterLat = (Math.random() - 0.5) * 0.0015;
+            const jitterLng = (Math.random() - 0.5) * 0.0015;
 
+            rider.last_lat = parseFloat(rider.last_lat) + jitterLat;
+            rider.last_lng = parseFloat(rider.last_lng) + jitterLng;
+
+            // Batch-safe update (simplified)
             await db.query(
-                'UPDATE delivery_partners SET last_lat = $1, last_lng = $2 WHERE id = $3',
+                'UPDATE delivery_partners SET last_lat = $1, last_lng = $2, last_seen_at = NOW() WHERE id = $3',
                 [rider.last_lat, rider.last_lng, rider.id]
             );
 
@@ -108,7 +122,8 @@ async function stopChaos(businessId) {
         _simulationInterval = null;
     }
 
-    return { message: 'Chaos engine disengaged and data scrubbed' };
+    return { message: 'Chaos engine disengaged and Hyderabad data scrubbed' };
 }
 
 module.exports = { startChaos, stopChaos, setIo };
+

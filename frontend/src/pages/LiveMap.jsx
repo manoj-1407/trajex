@@ -26,12 +26,12 @@ L.Icon.Default.mergeOptions({
 });
 
 function MovingMarker({ rider, onClick }) {
-  const [position, setPosition] = useState([rider.last_lat, rider.last_lng]);
+  const [position, setPosition] = useState([rider.lastLat, rider.lastLng]);
 
   useEffect(() => {
     // Basic interpolation logic
     const startPos = position;
-    const endPos = [rider.last_lat, rider.last_lng];
+    const endPos = [rider.lastLat, rider.lastLng];
     if (startPos[0] === endPos[0] && startPos[1] === endPos[1]) return;
 
     let startTime = null;
@@ -52,7 +52,7 @@ function MovingMarker({ rider, onClick }) {
     }
     
     requestAnimationFrame(animate);
-  }, [rider.last_lat, rider.last_lng]);
+  }, [rider.lastLat, rider.lastLng]);
 
   return (
     <Marker position={position} eventHandlers={{ click: onClick }}>
@@ -69,11 +69,11 @@ function MovingMarker({ rider, onClick }) {
           <div style={{ padding: '8px', background: 'var(--bg-hover)', borderRadius: '8px', fontSize: '12px' }}>
              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                 <span style={{ color: 'var(--text-secondary)' }}>LOAD</span>
-                <span style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{rider.active_orders} ACTIVE</span>
+                <span style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{rider.activeOrders} ACTIVE</span>
              </div>
              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: 'var(--text-secondary)' }}>RELIABILITY</span>
-                <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{rider.reliability_score}/5.0</span>
+                <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{rider.reliabilityScore}/5.0</span>
              </div>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function LiveMap() {
   useEffect(() => {
     if (!socket) return;
     const onRiderLoc = (data) => {
-      setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, last_lat: data.lat, last_lng: data.lng, moving: true } : r));
+      setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, lastLat: data.lat, lastLng: data.lng, moving: true } : r));
     };
     socket.on('rider-location', onRiderLoc);
     return () => socket.off('rider-location', onRiderLoc);
@@ -121,7 +121,7 @@ export default function LiveMap() {
   const transitOrders = useMemo(() => orders.filter(o => o.status === 'in_transit'), [orders]);
 
   // Map settings
-  const center = activeRiders.find(r => r.last_lat) ? [activeRiders.find(r => r.last_lat).last_lat, activeRiders.find(r => r.last_lat).last_lng] : [17.3850, 78.4867];
+  const center = activeRiders.find(r => r.lastLat) ? [activeRiders.find(r => r.lastLat).lastLat, activeRiders.find(r => r.lastLat).lastLng] : [17.3850, 78.4867];
 
   return (
     <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 120px)', borderRadius: 'var(--radius-2xl)', overflow: 'hidden', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}>
@@ -146,12 +146,12 @@ export default function LiveMap() {
         
         {/* Destination Polylines */}
         {transitOrders.map(order => {
-          const rider = activeRiders.find(r => r.id === order.rider_id);
-          if (rider && rider.last_lat && order.drop_lat) {
+          const rider = activeRiders.find(r => r.id === order.riderId);
+          if (rider && rider.lastLat && order.dropLat) {
             return (
               <Polyline 
                 key={`path-${order.id}`}
-                positions={[[rider.last_lat, rider.last_lng], [order.drop_lat, order.drop_lng]]}
+                positions={[[rider.lastLat, rider.lastLng], [order.dropLat, order.dropLng]]}
                 pathOptions={{ color: 'var(--accent)', weight: 3, opacity: 0.6 }}
                 className="leaflet-v-path"
               />
@@ -161,7 +161,7 @@ export default function LiveMap() {
         })}
 
         {/* Rider Markers */}
-        {activeRiders.map(rider => rider.last_lat && (
+        {activeRiders.map(rider => rider.lastLat && (
           <MovingMarker key={rider.id} rider={rider} onClick={() => setSelectedRider(rider)} />
         ))}
       </MapContainer>

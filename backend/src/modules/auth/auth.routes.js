@@ -57,14 +57,14 @@ router.get('/me', authenticate, async (req, res, next) => {
     try {
         const db = require('../../config/db');
         const r = await db.query(
-            `SELECT u.id, u.name, u.email, u.role, u.avatar_url,
+            `SELECT u.id, u.name, u.email, u.role, u.avatar_url, u.must_change_password,
                     b.name AS business_name, b.slug, b.accent_color
              FROM users u JOIN businesses b ON b.id = u.business_id
              WHERE u.id = $1 AND u.is_active = true`,
             [req.user.id]
         );
         if (!r.rows.length) return res.status(401).json({ error: 'User not found' });
-        res.json({ user: r.rows[0] });
+        res.json({ user: { ...r.rows[0], mustChangePassword: r.rows[0].must_change_password } });
     } catch (err) { next(err); }
 });
 
@@ -103,7 +103,7 @@ router.post('/change-password', authenticate, [
         if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
         const newHash = await bcrypt.hash(newPassword, 12);
         await db.withTransaction(async (client) => {
-            await client.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, req.user.id]);
+            await client.query('UPDATE users SET password_hash = $1, must_change_password = FALSE WHERE id = $2', [newHash, req.user.id]);
             await client.query('UPDATE refresh_tokens SET is_revoked = TRUE WHERE user_id = $1 AND is_revoked = FALSE', [req.user.id]);
         });
         res.json({ message: 'Password changed successfully. Please log in again.' });

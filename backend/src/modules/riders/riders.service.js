@@ -13,7 +13,22 @@ async function getRiders(businessId, { status, page, limit } = {}) {
     params.push(safeLimit); params.push((safePage - 1) * safeLimit);
     const result = await db.queryForTenant(
         businessId,
-        'SELECT id, user_id, name, phone, vehicle_type, status, active_orders, reliability_score, last_lat, last_lng, last_seen_at, created_at FROM delivery_partners ' + where + ' ORDER BY status ASC, name ASC LIMIT $' + (params.length - 1) + ' OFFSET $' + params.length,
+        `SELECT 
+            id, 
+            user_id AS "userId", 
+            name, 
+            phone, 
+            vehicle_type AS "vehicleType", 
+            status, 
+            active_orders AS "activeOrders", 
+            reliability_score AS "reliabilityScore", 
+            last_lat AS "lastLat", 
+            last_lng AS "lastLng", 
+            last_seen_at AS "lastSeenAt", 
+            created_at AS "createdAt" 
+         FROM delivery_partners ${where} 
+         ORDER BY status ASC, name ASC 
+         LIMIT $${params.length - 1} OFFSET $${params.length}`,
         params
     );
     return { riders: result.rows, total, page: safePage, limit: safeLimit, pages: Math.ceil(total / safeLimit) };
@@ -22,20 +37,51 @@ async function getRiders(businessId, { status, page, limit } = {}) {
 async function getRider(businessId, riderId) {
     const result = await db.queryForTenant(
         businessId,
-        'SELECT dp.*, u.email FROM delivery_partners dp LEFT JOIN users u ON u.id = dp.user_id WHERE dp.id = $1 AND dp.business_id = $2',
+        `SELECT 
+            dp.*, 
+            dp.user_id AS "userId",
+            dp.vehicle_type AS "vehicleType", 
+            dp.active_orders AS "activeOrders",
+            dp.reliability_score AS "reliabilityScore",
+            dp.last_lat AS "lastLat",
+            dp.last_lng AS "lastLng",
+            dp.last_seen_at AS "lastSeenAt",
+            dp.created_at AS "createdAt",
+            u.email 
+         FROM delivery_partners dp 
+         LEFT JOIN users u ON u.id = dp.user_id 
+         WHERE dp.id = $1 AND dp.business_id = $2`,
         [riderId, businessId]
     );
     return result.rows[0] || null;
 }
 
 async function createRider(businessId, data) {
+    // Note: This is for manual creation without a separate user account flow
+    // In production, we usually use inviteRider to ensure a user account exists.
+    // However, if we use this, we should ensure the associated user (if any) is flagged.
     const { name, phone, vehicleType } = data;
     const result = await db.queryForTenant(
         businessId,
         'INSERT INTO delivery_partners (business_id, name, phone, vehicle_type) VALUES ($1,$2,$3,$4) RETURNING *',
         [businessId, name, phone, vehicleType || 'bike']
     );
-    return result.rows[0];
+    // Standardization: return camelCase
+    const r = result.rows[0];
+    return {
+        id: r.id,
+        userId: r.user_id,
+        name: r.name,
+        phone: r.phone,
+        vehicleType: r.vehicle_type,
+        status: r.status,
+        activeOrders: r.active_orders,
+        reliabilityScore: r.reliability_score,
+        lastLat: r.last_lat,
+        lastLng: r.last_lng,
+        lastSeenAt: r.last_seen_at,
+        createdAt: r.created_at
+    };
 }
 
 async function updateStatus(businessId, riderId, status) {
@@ -71,7 +117,7 @@ async function inviteRider(businessId, inviterUserId, { name, email, phone }) {
 
     const result = await db.withTenantTransaction(businessId, async (client) => {
         const uRes = await client.query(
-            "INSERT INTO users (business_id, email, password_hash, name, phone, role) VALUES ($1,$2,$3,$4,$5,'staff') RETURNING id, email, name",
+            "INSERT INTO users (business_id, email, password_hash, name, phone, role, must_change_password) VALUES ($1,$2,$3,$4,$5,'staff', TRUE) RETURNING id, email, name",
             [businessId, email, passwordHash, name, phone || null]
         );
         const user = uRes.rows[0];

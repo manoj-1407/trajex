@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://TRAJEX_BACKEND_URL/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

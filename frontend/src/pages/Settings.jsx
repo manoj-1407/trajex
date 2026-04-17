@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { User, Building, Users, Bell, Shield, Plug, AlertTriangle } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
 import { ProfileSection } from '../components/ProfileSection';
@@ -11,7 +12,16 @@ import api from '../api/client';
 
 export default function Settings() {
   const { user, setAuth, logout } = useAuthStore();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('profile');
+
+  // Handle forced password change redirect
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('force_password_change') === 'true' || user?.mustChangePassword) {
+      setActiveTab('security');
+    }
+  }, [location.search, user?.mustChangePassword]);
   const isOwner = user?.role === 'owner';
 
   // API State
@@ -238,6 +248,16 @@ export default function Settings() {
           {activeTab === 'security' && (
             <div className="fade-in-up">
                <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '24px' }}>Security</h2>
+               
+               {user?.mustChangePassword && (
+                 <div className="glass-card" style={{ border: '1px solid var(--warning)', background: 'rgba(255, 180, 0, 0.05)', padding: '16px', marginBottom: '24px', display: 'flex', gap: '12px' }}>
+                    <AlertTriangle color="var(--warning)" size={20} />
+                    <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>
+                      <strong>Security Action Required:</strong> Your account was initialized with a temporary password. You must set a new secure password before you can access the dispatch mission control.
+                    </div>
+                 </div>
+               )}
+
                <div style={{ maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
                  <h3 style={{ fontSize: '15px', fontWeight: 600 }}>Change Password</h3>
                  <Input 

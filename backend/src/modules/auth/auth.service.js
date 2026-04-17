@@ -18,7 +18,13 @@ const REFRESH_COOKIE = {
 
 function signAccess(user) {
     return jwt.sign(
-        { id: user.id, businessId: user.business_id, role: user.role, email: user.email },
+        { 
+            id: user.id, 
+            businessId: user.business_id || user.businessId, 
+            role: user.role, 
+            email: user.email,
+            mustChangePassword: user.must_change_password || user.mustChangePassword || false
+        },
         env.JWT_ACCESS_SECRET,
         { expiresIn: env.JWT_ACCESS_EXPIRES_IN }
     );
@@ -50,7 +56,7 @@ async function register(req, res, next) {
             const biz = await client.query('INSERT INTO businesses (name, slug) VALUES ($1,$2) RETURNING id', [businessName, slug]);
             const bizId = biz.rows[0].id;
             const u = await client.query(
-                'INSERT INTO users (business_id, email, password_hash, name, phone, role) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, email, name, role, business_id',
+                'INSERT INTO users (business_id, email, password_hash, name, phone, role, must_change_password) VALUES ($1,$2,$3,$4,$5,$6, FALSE) RETURNING id, email, name, role, business_id, must_change_password',
                 [bizId, email, passwordHash, name, phone || null, 'owner']
             );
             return u.rows[0];
@@ -74,7 +80,7 @@ async function login(req, res, next) {
         const { password } = req.body;
         const email = req.body.email.trim().toLowerCase();
         const result = await db.query(
-            'SELECT id, email, name, role, password_hash, is_active, business_id FROM users WHERE email = $1',
+            'SELECT id, email, name, role, password_hash, is_active, business_id, must_change_password FROM users WHERE email = $1',
             [email]
         );
         if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
@@ -89,7 +95,14 @@ async function login(req, res, next) {
         res.cookie('tx_refresh', refreshRaw, REFRESH_COOKIE);
         return res.status(200).json({
             accessToken,
-            user: { id: user.id, email: user.email, name: user.name, role: user.role, businessId: user.business_id },
+            user: { 
+                id: user.id, 
+                email: user.email, 
+                name: user.name, 
+                role: user.role, 
+                businessId: user.business_id,
+                mustChangePassword: user.must_change_password || false 
+            },
         });
     } catch (err) {
         next(err);
@@ -206,7 +219,14 @@ async function googleLogin(req, res, next) {
 
         return res.status(200).json({
             accessToken,
-            user: { id: user.id, email: user.email, name: user.name, role: user.role, businessId: user.business_id },
+            user: { 
+                id: user.id, 
+                email: user.email, 
+                name: user.name, 
+                role: user.role, 
+                businessId: user.business_id,
+                mustChangePassword: user.must_change_password || false
+            },
         });
     } catch (err) {
         next(err);

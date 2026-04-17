@@ -153,7 +153,7 @@ export default function Dashboard() {
     };
 
     const onRiderUpdate = (data) => {
-      setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, last_lat: data.lat, last_lng: data.lng, last_seen_at: new Date() } : r));
+      setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, lastLat: data.lat, lastLng: data.lng, lastSeenAt: new Date() } : r));
       addToFeed({ 
         id: Date.now(), 
         type: 'SYNC', 
@@ -298,7 +298,7 @@ export default function Dashboard() {
                   <div key={o.id} style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                      <div>
                         <div style={{ fontFamily: 'var(--font-mono)', color: HUD_COLORS.accent, fontSize: '11px', fontWeight: 800 }}>UNIT::{o.id.substring(0,8).toUpperCase()}</div>
-                        <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{o.customer_name}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{o.customerName}</div>
                      </div>
                      <Badge status={o.status} size="sm" />
                   </div>
@@ -317,7 +317,7 @@ export default function Dashboard() {
                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '13px' }}>{r.name.charAt(0)}</div>
                      <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{r.name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{r.active_orders} ACTIVE_OPS</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{r.activeOrders} ACTIVE_OPS</div>
                      </div>
                      <div className="pulse" style={{ width: '6px', height: '6px', borderRadius: '50%', background: r.status === 'busy' ? HUD_COLORS.warning : HUD_COLORS.success }} />
                   </div>
