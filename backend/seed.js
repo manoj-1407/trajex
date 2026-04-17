@@ -12,6 +12,10 @@ async function run() {
   const BID = biz.rows[0].id;
   console.log('  business_id:', BID);
 
+  if (!process.env.DEMO_ADMIN_PW || !process.env.DEMO_MANAGER_PW || !process.env.DEMO_STAFF_PW) {
+    throw new Error('DEMO_ADMIN_PW, DEMO_MANAGER_PW, and DEMO_STAFF_PW environment variables must be securely set to seed the database.');
+  }
+
   // Set these passwords in your environment before seeding production-like environments
   const USERS = [
     { name:'Arjun Reddy',  email:'admin@trajex.io',   pw: process.env.DEMO_ADMIN_PW,   role:'owner'   },
