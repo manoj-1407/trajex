@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trajex | Mission Control for Ultra-Fast Logistics</title>
+    <meta name="description" content="High-performance, multi-tenant dispatch intelligence for world-class delivery fleets." />
+    <meta name="theme-color" content="#00e5cc" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Trajex" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta property="og:title" content="Trajex Elite" />
+    <meta property="og:description" content="Mission Control for Ultra-Fast Logistics. Real-time telemetry, automated assignment, and deep RLS security." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script>
+      (function(){
+        var t = localStorage.getItem('trajex-theme') || 
+                (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var io = new IntersectionObserver(function(entries) {
+          entries.forEach(function(e) { if(e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }});
+        }, {threshold: 0.1});
+        // We will observe fade-in-up class when React renders it via a MutationObserver or by just letting React components manage it
+        // Adding global mutation observer for elements created dynamically
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+              if(node.nodeType === 1) {
+                if(node.classList.contains('fade-in-up')) io.observe(node);
+                node.querySelectorAll('.fade-in-up').forEach(function(el) { io.observe(el); });
+              }
+            });
+          });
+        });
+        observer.observe(document.body, {childList: true, subtree: true});
+      });
+    </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      });
+    }
+  </script>
+</body>
+</html>
