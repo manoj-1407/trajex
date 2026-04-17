@@ -110,13 +110,20 @@ export default function Dashboard() {
   const socket = useSocket();
   const navigate = useNavigate();
 
-  // Sophisticated telemetry generation
+  // Calculate real spark data from the last 12 days of trends
   const sparkData = useMemo(() => {
-    // Generates a 'Mission Profile' curve
-    return Array.from({ length: 12 }, (_, i) => ({ 
-      val: 20 + Math.sin(i / 2) * 10 + (i % 3 === 0 ? 5 : 0) 
-    }));
-  }, []);
+    if (!trend || trend.length === 0) return Array(12).fill({ val: 0 });
+    return trend.slice(-12).map(d => ({ val: d.total || 0 }));
+  }, [trend]);
+
+  // Calculate real percentage change
+  const orderTrendPct = useMemo(() => {
+    if (!trend || trend.length < 2) return "+0%";
+    const current = trend[trend.length - 1].total;
+    const previous = trend[0].total || 1; // Avoid div by zero
+    const change = ((current - previous) / previous) * 100;
+    return `${change > 0 ? '+' : ''}${change.toFixed(1)}%`;
+  }, [trend]);
 
   useEffect(() => {
     const start = Date.now();
@@ -217,9 +224,9 @@ export default function Dashboard() {
       <div className="grid-auto" id="dashboard-kpi">
         {loading ? <SkeletonKPI count={4} /> : (
           <>
-            <TelemetryModule icon={Package} label="Total Orders" value={analytics?.orders?.total || 0} trend="+12.5%" color={HUD_COLORS.info} data={sparkData} />
-            <TelemetryModule icon={Users} label="Active Riders" value={(analytics?.riders?.byStatus?.available || 0) + (analytics?.riders?.byStatus?.busy || 0)} color={HUD_COLORS.accent} data={sparkData.map(d => ({ val: d.val + 5 }))} />
-            <TelemetryModule icon={Zap} label="Delivery Rate" value={`${analytics?.orders?.deliveryRate || 0}%`} trend="+0.5%" color={HUD_COLORS.success} data={sparkData.map(d => ({ val: 50 - d.val }))} />
+            <TelemetryModule icon={Package} label="Total Orders" value={analytics?.orders?.total || 0} trend={orderTrendPct} color={HUD_COLORS.info} data={sparkData} />
+            <TelemetryModule icon={Users} label="Active Riders" value={(analytics?.riders?.byStatus?.available || 0) + (analytics?.riders?.byStatus?.busy || 0)} color={HUD_COLORS.accent} data={sparkData} />
+            <TelemetryModule icon={Zap} label="Delivery Rate" value={`${analytics?.orders?.deliveryRate || 0}%`} trend={orderTrendPct} color={HUD_COLORS.success} data={sparkData} />
             <TelemetryModule icon={Shield} label="System Security" value="OK" color={HUD_COLORS.warning} data={Array(10).fill({ val: 0 })} />
           </>
         )}

@@ -50,7 +50,7 @@ export function SocketProvider({ children }) {
       socketRef.current = null;
       setSocket(null);
     };
-  }, [token, isAuthenticated]);
+  }, [token, isAuthenticated, user]);
 
   return (
     <SocketContext.Provider value={socket}>

@@ -12,10 +12,11 @@ async function run() {
   const BID = biz.rows[0].id;
   console.log('  business_id:', BID);
 
+  // Set these passwords in your environment before seeding production-like environments
   const USERS = [
-  { name:'Arjun Reddy',  email:'admin@trajex.io',   pw: process.env.DEMO_ADMIN_PW   || 'Admin@Default123!',   role:'owner'   },
-  { name:'Priya Sharma', email:'manager@trajex.io', pw: process.env.DEMO_MANAGER_PW || 'Manager@Default123!', role:'manager' },
-  { name:'Rohith Kumar', email:'staff@trajex.io',   pw: process.env.DEMO_STAFF_PW   || 'Staff@Default123!',   role:'staff'   },
+    { name:'Arjun Reddy',  email:'admin@trajex.io',   pw: process.env.DEMO_ADMIN_PW,   role:'owner'   },
+    { name:'Priya Sharma', email:'manager@trajex.io', pw: process.env.DEMO_MANAGER_PW, role:'manager' },
+    { name:'Rohith Kumar', email:'staff@trajex.io',   pw: process.env.DEMO_STAFF_PW,   role:'staff'   },
   ];
   for (const u of USERS) {
     const h = await bcrypt.hash(u.pw, 10);
