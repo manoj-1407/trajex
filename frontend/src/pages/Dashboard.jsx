@@ -153,7 +153,7 @@ export default function Dashboard() {
     };
 
     const onRiderUpdate = (data) => {
-      setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, lastLat: data.lat, lastLng: data.lng, lastSeenAt: new Date() } : r));
+      setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, lastLat: data.lastLat, lastLng: data.lastLng, lastSeenAt: new Date() } : r));
       addToFeed({ 
         id: Date.now(), 
         type: 'SYNC', 

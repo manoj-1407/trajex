@@ -73,14 +73,14 @@ export default function MyDeliveries() {
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
               <Badge status={currentOrder.status} />
               <div style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
-                <Clock size={14} style={{ marginRight: '4px' }} /> Assigned {formatTimeAgo(currentOrder.updated_at)}
+                <Clock size={14} style={{ marginRight: '4px' }} /> Assigned {formatTimeAgo(currentOrder.updatedAt)}
               </div>
             </div>
 
-            <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>{currentOrder.customer_name}</h2>
+            <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>{currentOrder.customerName}</h2>
             
-            <a href={`tel:${currentOrder.customer_phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', textDecoration: 'none', marginBottom: '24px', padding: '6px 12px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-full)', fontSize: '14px', fontWeight: 500 }}>
-              <Phone size={14} /> {currentOrder.customer_phone}
+            <a href={`tel:${currentOrder.customerPhone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', textDecoration: 'none', marginBottom: '24px', padding: '6px 12px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-full)', fontSize: '14px', fontWeight: 500 }}>
+              <Phone size={14} /> {currentOrder.customerPhone}
             </a>
 
             <div className="divider" style={{ margin: '0 0 24px 0' }} />
@@ -91,8 +91,8 @@ export default function MyDeliveries() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 600 }}>Destination</div>
-                <div style={{ fontSize: '16px', color: 'var(--text-primary)', lineHeight: 1.5 }}>{currentOrder.drop_address}</div>
-                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(currentOrder.drop_address)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '12px', fontSize: '14px', color: 'var(--accent)', fontWeight: 500, textDecoration: 'none' }}>
+                <div style={{ fontSize: '16px', color: 'var(--text-primary)', lineHeight: 1.5 }}>{currentOrder.dropAddress}</div>
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(currentOrder.dropAddress)}`} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: '12px', fontSize: '14px', color: 'var(--accent)', fontWeight: 500, textDecoration: 'none' }}>
                   Open in Maps →
                 </a>
               </div>
@@ -129,8 +129,8 @@ export default function MyDeliveries() {
             {pendingOrders.map(o => (
               <div key={o.id} className="glass-card" style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{o.customer_name}</div>
-                  <div className="truncate" style={{ fontSize: '13px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{o.drop_address}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{o.customerName}</div>
+                  <div className="truncate" style={{ fontSize: '13px', color: 'var(--text-secondary)', maxWidth: '200px' }}>{o.dropAddress}</div>
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted)' }}>#{o.id.substring(0,6).toUpperCase()}</div>
               </div>
@@ -148,9 +148,9 @@ export default function MyDeliveries() {
               <div key={o.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderBottom: '1px solid var(--border-subtle)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <CheckCircle size={16} color="var(--success)" />
-                  <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{o.customer_name}</span>
+                  <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{o.customerName}</span>
                 </div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{formatTimeAgo(o.updated_at)}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{formatTimeAgo(o.updatedAt)}</div>
               </div>
             ))}
            </div>

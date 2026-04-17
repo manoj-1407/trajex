@@ -29,7 +29,7 @@ async function startChaos(businessId) {
     for (const name of names) {
         const res = await db.query(
             `INSERT INTO delivery_partners (business_id, name, phone, status, last_lat, last_lng, reliability_score) 
-             VALUES ($1, $2, $3, 'available', $4, $5, $6) RETURNING *`,
+             VALUES ($1, $2, $3, 'available', $4, $5, $6) RETURNING id, name, phone, status, last_lat AS "lastLat", last_lng AS "lastLng", reliability_score AS "reliabilityScore"`,
             [
                 businessId, 
                 name, 
@@ -81,26 +81,22 @@ async function startChaos(businessId) {
 async function moveSimulatedRiders() {
     for (const [bizId, sim] of _activeSimulations.entries()) {
         for (const rider of sim.riders) {
-            // Intelligent Movement: Identify target (currently random jitter, but aligned with region)
-            // In a full implementation, we would query assigned orders here.
-            // For now, we simulate 'patrol' movement in Hyderabad.
             const jitterLat = (Math.random() - 0.5) * 0.0015;
             const jitterLng = (Math.random() - 0.5) * 0.0015;
 
-            rider.last_lat = parseFloat(rider.last_lat) + jitterLat;
-            rider.last_lng = parseFloat(rider.last_lng) + jitterLng;
+            rider.lastLat = parseFloat(rider.lastLat) + jitterLat;
+            rider.lastLng = parseFloat(rider.lastLng) + jitterLng;
 
-            // Batch-safe update (simplified)
             await db.query(
                 'UPDATE delivery_partners SET last_lat = $1, last_lng = $2, last_seen_at = NOW() WHERE id = $3',
-                [rider.last_lat, rider.last_lng, rider.id]
+                [rider.lastLat, rider.lastLng, rider.id]
             );
 
             if (_io) {
                 _io.to('org:' + bizId).emit('rider-location', {
                     riderId: rider.id,
-                    lat: rider.last_lat,
-                    lng: rider.last_lng,
+                    lastLat: rider.lastLat,
+                    lastLng: rider.lastLng,
                     ts: Date.now()
                 });
             }
@@ -112,7 +108,6 @@ async function stopChaos(businessId) {
     const sim = _activeSimulations.get(businessId);
     if (!sim) return { message: 'No simulation running' };
 
-    // Clean up riders created for simulation
     const riderIds = sim.riders.map(r => r.id);
     await db.query('DELETE FROM delivery_partners WHERE id = ANY($1)', [riderIds]);
     
@@ -126,4 +121,3 @@ async function stopChaos(businessId) {
 }
 
 module.exports = { startChaos, stopChaos, setIo };
-

@@ -14,7 +14,7 @@ async function checkSLABreaches() {
     try {
         // 1. Check for actual breaches
         const breachResult = await query(`
-            SELECT o.id, o.business_id, o.customer_name, o.created_at, o.sla_minutes
+            SELECT o.id, o.business_id AS "businessId", o.customer_name AS "customerName", o.created_at AS "createdAt", o.sla_minutes AS "slaMinutes"
             FROM orders o
             WHERE o.status IN ('assigned', 'picked_up', 'in_transit')
             AND o.created_at < NOW() - (COALESCE(o.sla_minutes, 45) * INTERVAL '1 minute')
@@ -29,7 +29,7 @@ async function checkSLABreaches() {
 
         // 2. Check for "Early Warnings" (10 minutes remaining)
         const warningResult = await query(`
-            SELECT o.id, o.business_id, o.customer_name, o.created_at, o.sla_minutes
+            SELECT o.id, o.business_id AS "businessId", o.customer_name AS "customerName", o.created_at AS "createdAt", o.sla_minutes AS "slaMinutes"
             FROM orders o
             WHERE o.status IN ('assigned', 'picked_up', 'in_transit', 'confirmed')
             AND o.created_at < NOW() - ((COALESCE(o.sla_minutes, 45) - 10) * INTERVAL '1 minute')
@@ -53,31 +53,31 @@ async function checkSLABreaches() {
 
 async function processSLAEvent(order, code, title, phrase) {
     try {
-        await withTenantTransaction(order.business_id, async (client) => {
+        await withTenantTransaction(order.businessId, async (client) => {
             await client.query(
                 `INSERT INTO delay_events (business_id, order_id, reason_code) VALUES ($1, $2, $3)`,
-                [order.business_id, order.id, code]
+                [order.businessId, order.id, code]
             );
             
             const users = await client.query(
                 `SELECT id FROM users WHERE business_id = $1 AND role IN ('owner', 'manager')`,
-                [order.business_id]
+                [order.businessId]
             );
             
             for (const u of users.rows) {
                 await createNotification(
-                    order.business_id, u.id, code, title,
-                    `Order ${order.id.substring(0,8)} for ${order.customer_name} ${phrase} ${order.sla_minutes || 45}-minute SLA.`,
+                    order.businessId, u.id, code, title,
+                    `Order ${order.id.substring(0,8)} for ${order.customerName} ${phrase} ${order.slaMinutes || 45}-minute SLA.`,
                     { orderId: order.id }, _io
                 ).catch(() => {});
             }
         });
 
         if (_io) {
-            _io.to('org:' + order.business_id).emit('sla-update', {
+            _io.to('org:' + order.businessId).emit('sla-update', {
                 orderId: order.id,
                 type: code,
-                customerName: order.customer_name
+                customerName: order.customerName
             });
         }
     } catch (err) {

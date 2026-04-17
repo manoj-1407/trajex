@@ -57,14 +57,22 @@ router.get('/me', authenticate, async (req, res, next) => {
     try {
         const db = require('../../config/db');
         const r = await db.query(
-            `SELECT u.id, u.name, u.email, u.role, u.avatar_url, u.must_change_password,
-                    b.name AS business_name, b.slug, b.accent_color
+            `SELECT 
+                u.id, 
+                u.name, 
+                u.email, 
+                u.role, 
+                u.avatar_url AS "avatarUrl", 
+                u.must_change_password AS "mustChangePassword",
+                b.name AS "businessName", 
+                b.slug, 
+                b.accent_color AS "accentColor"
              FROM users u JOIN businesses b ON b.id = u.business_id
              WHERE u.id = $1 AND u.is_active = true`,
             [req.user.id]
         );
         if (!r.rows.length) return res.status(401).json({ error: 'User not found' });
-        res.json({ user: { ...r.rows[0], mustChangePassword: r.rows[0].must_change_password } });
+        res.json({ user: r.rows[0] });
     } catch (err) { next(err); }
 });
 

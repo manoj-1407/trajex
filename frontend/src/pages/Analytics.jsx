@@ -49,7 +49,7 @@ export default function Analytics() {
             })),
             timeTrend: timeRes.data.map(d => ({
               date: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-              avgTime: Math.round(d.avg_minutes)
+              avgTime: Math.round(d.avgMinutes)
             })),
             topRiders: ridersRes.data
           });
@@ -234,10 +234,10 @@ export default function Analytics() {
                 <tbody>
                   {data.topRiders.map((rider, i) => (
                     <tr key={rider.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                      <td style={{ padding: '16px 0', fontWeight: 500, color: 'var(--text-primary)' }}>{rider.full_name}</td>
+                      <td style={{ padding: '16px 0', fontWeight: 500, color: 'var(--text-primary)' }}>{rider.fullName}</td>
                       <td style={{ padding: '16px 0', color: 'var(--text-secondary)' }}>{rider.deliveries}</td>
-                      <td style={{ padding: '16px 0', color: 'var(--text-secondary)' }}>{rider.avg_minutes.toFixed(1)}m</td>
-                      <td style={{ padding: '16px 0', color: 'var(--text-secondary)' }}>{(rider.success_rate * 100).toFixed(0)}%</td>
+                      <td style={{ padding: '16px 0', color: 'var(--text-secondary)' }}>{rider.avgMinutes.toFixed(1)}m</td>
+                      <td style={{ padding: '16px 0', color: 'var(--text-secondary)' }}>{(rider.successRate * 100).toFixed(0)}%</td>
                     </tr>
                   ))}
                 </tbody>

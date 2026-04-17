@@ -11,7 +11,7 @@ async function getNotifications(businessId, userId, page = 1, limit = 20) {
     
     const result = await db.queryForTenant(
         businessId,
-        'SELECT * FROM notifications WHERE business_id=$1 AND user_id=$2 ORDER BY created_at DESC LIMIT $3 OFFSET $4',
+        'SELECT id, type, title, message, metadata, read_at AS "readAt", created_at AS "createdAt" FROM notifications WHERE business_id=$1 AND user_id=$2 ORDER BY created_at DESC LIMIT $3 OFFSET $4',
         [businessId, userId, safeLimit, offset]
     );
     return { notifications: result.rows, total, page: safePage, limit: safeLimit, pages: Math.ceil(total / safeLimit) };
@@ -20,7 +20,7 @@ async function getNotifications(businessId, userId, page = 1, limit = 20) {
 async function markRead(notificationId, userId, businessId) {
     const result = await db.queryForTenant(
         businessId,
-        'UPDATE notifications SET read_at=NOW() WHERE id=$1 AND user_id=$2 AND business_id=$3 AND read_at IS NULL RETURNING *',
+        'UPDATE notifications SET read_at=NOW() WHERE id=$1 AND user_id=$2 AND business_id=$3 AND read_at IS NULL RETURNING id, read_at AS "readAt"',
         [notificationId, userId, businessId]
     );
     return result.rows[0] || null;
@@ -38,7 +38,7 @@ async function markAllRead(userId, businessId) {
 async function createNotification(businessId, userId, type, title, message, metadata = {}, io) {
     const result = await db.queryForTenant(
         businessId,
-        'INSERT INTO notifications (business_id, user_id, type, title, message, metadata) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *',
+        'INSERT INTO notifications (business_id, user_id, type, title, message, metadata) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, type, title, message, metadata, created_at AS "createdAt"',
         [businessId, userId, type, title, message, metadata]
     );
     const notification = result.rows[0];

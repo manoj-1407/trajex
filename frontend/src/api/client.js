@@ -9,6 +9,25 @@ const getAuthStore = async () => {
   return authStore;
 };
 
+/**
+ * Recursively converts a snake_case object into a camelCase object.
+ * Essential for 10/10 data consistency from PostgreSQL to Frontend.
+ */
+function toCamel(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map(v => toCamel(v));
+  } else if (obj !== null && obj.constructor === Object) {
+    return Object.keys(obj).reduce(
+      (result, key) => ({
+        ...result,
+        [key.replace(/(_[a-z])/g, (get) => get.toUpperCase().replace('_', ''))]: toCamel(obj[key]),
+      }),
+      {},
+    );
+  }
+  return obj;
+}
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api/v1',
   withCredentials: true,
@@ -32,7 +51,13 @@ let isRefreshing = false;
 let queue = [];
 
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // 10/10 Consistency: Auto-transform all response data to camelCase
+    if (res.data) {
+      res.data = toCamel(res.data);
+    }
+    return res;
+  },
   async (err) => {
     const original = err.config;
     if (err.response?.status === 401 && !original._retry) {
@@ -46,7 +71,8 @@ api.interceptors.response.use(
       original._retry = true;
       isRefreshing = true;
       try {
-        const { data } = await axios.post('/api/v1/auth/refresh', {}, { withCredentials: true });
+        const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
+        const { data } = await axios.post(`${baseURL}/auth/refresh`, {}, { withCredentials: true });
         const store = await getAuthStore();
         store.getState().setToken(data.accessToken);
         queue.forEach((p) => p.resolve(data.accessToken));

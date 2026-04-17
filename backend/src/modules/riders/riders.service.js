@@ -87,7 +87,7 @@ async function createRider(businessId, data) {
 async function updateStatus(businessId, riderId, status) {
     const result = await db.queryForTenant(
         businessId,
-        'UPDATE delivery_partners SET status = $1 WHERE id = $2 AND business_id = $3 AND is_active = TRUE RETURNING *',
+        'UPDATE delivery_partners SET status = $1 WHERE id = $2 AND business_id = $3 AND is_active = TRUE RETURNING id, status',
         [status, riderId, businessId]
     );
     return result.rows[0] || null;
@@ -96,11 +96,11 @@ async function updateStatus(businessId, riderId, status) {
 async function updateLocation(businessId, riderId, lat, lng, io) {
     const result = await db.queryForTenant(
         businessId,
-        'UPDATE delivery_partners SET last_lat = $1, last_lng = $2, last_seen_at = NOW() WHERE id = $3 AND business_id = $4 RETURNING id, last_lat, last_lng, last_seen_at',
+        'UPDATE delivery_partners SET last_lat = $1, last_lng = $2, last_seen_at = NOW() WHERE id = $3 AND business_id = $4 RETURNING id, last_lat AS "lastLat", last_lng AS "lastLng", last_seen_at AS "lastSeenAt"',
         [lat, lng, riderId, businessId]
     );
     if (!result.rows[0]) return null;
-    if (io) io.to('org:' + businessId).emit('rider-location', { riderId, lat, lng, ts: Date.now() });
+    if (io) io.to('org:' + businessId).emit('rider-location', { riderId, lastLat: lat, lastLng: lng, timestamp: Date.now() });
     return result.rows[0];
 }
 

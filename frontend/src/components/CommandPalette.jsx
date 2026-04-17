@@ -42,10 +42,10 @@ export default function CommandPalette() {
 
         const q = query.toLowerCase();
         const orders = (oRes.data?.orders || [])
-          .filter(o => o.id.toLowerCase().includes(q) || o.customer_name?.toLowerCase().includes(q))
+          .filter(o => o.id.toLowerCase().includes(q) || o.customerName?.toLowerCase().includes(q))
           .map(o => ({
             id: `order-${o.id}`,
-            title: `Order: ${o.customer_name}`,
+            title: `Order: ${o.customerName}`,
             subtitle: `#${o.id.substring(0,8).toUpperCase()}`,
             icon: Package,
             path: `/orders?id=${o.id}`,

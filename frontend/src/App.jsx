@@ -110,7 +110,7 @@ export default function App() {
         <div key={location.pathname} style={{ overflowX: 'hidden' }}>
           <Routes location={location}>
             {/* Public Routes */}
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />

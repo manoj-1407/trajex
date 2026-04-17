@@ -126,15 +126,15 @@ async function updateStatus(businessId, orderId, status, actorId, io) {
     const existing = await db.queryForTenant(businessId, 'SELECT * FROM orders WHERE id = $1 AND business_id = $2', [orderId, businessId]);
     if (existing.rows.length === 0) return null;
     const before = existing.rows[0];
-    const result = await db.queryForTenant(businessId, 'UPDATE orders SET status = $1 WHERE id = $2 AND business_id = $3 RETURNING *', [status, orderId, businessId]);
+    const result = await db.queryForTenant(businessId, 'UPDATE orders SET status = $1 WHERE id = $2 AND business_id = $3 RETURNING id, status, tracking_token AS "trackingToken"', [status, orderId, businessId]);
     const updated = result.rows[0];
     await db.queryForTenant(businessId, 'INSERT INTO tracking_events (order_id, type, actor_id) VALUES ($1,$2,$3)', [orderId, 'status_' + status, actorId]);
     if (status === 'delivered' && before.rider_id) {
         await db.queryForTenant(businessId, 'UPDATE delivery_partners SET active_orders = GREATEST(active_orders - 1, 0) WHERE id = $1', [before.rider_id]);
     }
     if (io) {
-        io.to('org:' + businessId).emit('order-updated', { id: orderId, status });
-        io.to('track:' + updated.tracking_token).emit('status-update', { status, ts: Date.now() });
+        io.to('org:' + businessId).emit('order-updated', { orderId, status });
+        io.to('track:' + updated.trackingToken).emit('status-update', { status, timestamp: Date.now() });
     }
     const { createNotification } = require('../notifications/notifications.service');
     if (['delivered', 'cancelled', 'failed'].includes(status)) {
@@ -170,14 +170,23 @@ async function assignRider(businessId, orderId, riderId, actorId, io) {
         await client.query('INSERT INTO tracking_events (order_id, rider_id, type, actor_id) VALUES ($1,$2,$3,$4)', [orderId, riderId, 'rider_assigned', actorId]);
         return updated.rows[0];
     });
-    if (io) io.to('org:' + businessId).emit('order-updated', { id: orderId, status: 'assigned', riderId });
+    if (io) io.to('org:' + businessId).emit('order-updated', { orderId, status: 'assigned', riderId });
     return result;
 }
 
 async function getOrderTimeline(businessId, orderId) {
     const result = await db.queryForTenant(
         businessId,
-        "SELECT te.*, u.name as actor_name FROM tracking_events te LEFT JOIN users u ON u.id = te.actor_id WHERE te.order_id=$1 ORDER BY te.created_at ASC",
+        `SELECT 
+            te.id, 
+            te.type, 
+            te.notes, 
+            te.created_at AS "createdAt", 
+            u.name AS "actorName" 
+         FROM tracking_events te 
+         LEFT JOIN users u ON u.id = te.actor_id 
+         WHERE te.order_id=$1 
+         ORDER BY te.created_at ASC`,
         [orderId]
     );
     return result.rows;

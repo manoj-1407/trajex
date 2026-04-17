@@ -111,7 +111,7 @@ export default function LiveMap() {
   useEffect(() => {
     if (!socket) return;
     const onRiderLoc = (data) => {
-      setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, lastLat: data.lat, lastLng: data.lng, moving: true } : r));
+      setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, lastLat: data.lastLat, lastLng: data.lastLng, moving: true } : r));
     };
     socket.on('rider-location', onRiderLoc);
     return () => socket.off('rider-location', onRiderLoc);

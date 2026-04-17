@@ -27,8 +27,8 @@ export default function PublicTracking() {
   useEffect(() => {
     api.get(`/tracking/${token}`).then(res => {
       setOrder(res.data);
-      if (res.data.rider_lat && res.data.rider_lng) {
-        setRiderLoc({ lat: res.data.rider_lat, lng: res.data.rider_lng, name: res.data.rider_name, phone: res.data.rider_phone });
+      if (res.data.riderLat && res.data.riderLng) {
+        setRiderLoc({ lat: res.data.riderLat, lng: res.data.riderLng, name: res.data.riderName, phone: res.data.riderPhone });
       }
     }).catch(() => {
       setError(true);
@@ -38,8 +38,8 @@ export default function PublicTracking() {
   }, [token]);
 
   useEffect(() => {
-    if (riderLoc?.lat && riderLoc?.lng && order?.drop_lat && order?.drop_lng) {
-      fetch(`https://router.project-osrm.org/route/v1/driving/${riderLoc.lng},${riderLoc.lat};${order.drop_lng},${order.drop_lat}?overview=full&geometries=geojson`)
+    if (riderLoc?.lat && riderLoc?.lng && order?.dropLat && order?.dropLng) {
+      fetch(`https://router.project-osrm.org/route/v1/driving/${riderLoc.lng},${riderLoc.lat};${order.dropLng},${order.dropLat}?overview=full&geometries=geojson`)
         .then(res => res.json())
         .then(data => {
           if (data.routes && data.routes[0]) {
@@ -53,10 +53,11 @@ export default function PublicTracking() {
   useEffect(() => {
     if (!socket || !order) return;
     const onOrderUpd = (data) => {
-      if (data.orderId === order.id) setOrder(prev => ({ ...prev, status: data.status, updated_at: new Date().toISOString() }));
+      if (data.orderId === order.id) setOrder(prev => ({ ...prev, status: data.status, updatedAt: new Date().toISOString() }));
     };
     const onRiderLoc = (data) => {
-      if (order.rider_id && data.riderId === order.rider_id) setRiderLoc(prev => ({ ...prev, lat: data.lat, lng: data.lng }));
+      // Data from socket emission uses lastLat/lastLng as standardized in previous steps
+      if (order.riderId && data.riderId === order.riderId) setRiderLoc(prev => ({ ...prev, lat: data.lastLat, lng: data.lastLng }));
     };
 
     socket.on('order-updated', onOrderUpd);
@@ -91,7 +92,7 @@ export default function PublicTracking() {
   ];
 
   const currentIdx = steps.findIndex(s => s.id === order.status);
-  const mapCenter = riderLoc?.lat ? [riderLoc.lat, riderLoc.lng] : [order.drop_lat, order.drop_lng];
+  const mapCenter = riderLoc?.lat ? [riderLoc.lat, riderLoc.lng] : [order.dropLat, order.dropLng];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)', color: 'var(--text-primary)', overflow: 'hidden' }}>
@@ -193,7 +194,7 @@ export default function PublicTracking() {
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               {routePath && <Polyline positions={routePath} color="var(--accent)" weight={5} opacity={0.6} />}
               
-              <Marker position={[order.drop_lat, order.drop_lng]}>
+              <Marker position={[order.dropLat, order.dropLng]}>
                  <Popup>Mission Objective</Popup>
               </Marker>
 
