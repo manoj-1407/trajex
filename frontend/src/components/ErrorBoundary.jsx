@@ -14,6 +14,10 @@ export default class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error', error, errorInfo);
+    // Auto-recover from stale PWA chunk caching during Vercel redeploys
+    if (error && error.message && error.message.includes('fetch dynamically imported module')) {
+      window.location.reload();
+    }
   }
 
   render() {
