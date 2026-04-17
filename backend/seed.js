@@ -13,9 +13,9 @@ async function run() {
   console.log('  business_id:', BID);
 
   const USERS = [
-    { name:'Arjun Reddy',  email:'admin@trajex.io',   pw:'Admin@2024!',   role:'owner'   },
-    { name:'Priya Sharma', email:'manager@trajex.io', pw:'Manager@2024!', role:'manager' },
-    { name:'Rohith Kumar', email:'staff@trajex.io',   pw:'Staff@2024!',   role:'staff'   },
+  { name:'Arjun Reddy',  email:'admin@trajex.io',   pw: process.env.DEMO_ADMIN_PW   || 'Admin@Default123!',   role:'owner'   },
+  { name:'Priya Sharma', email:'manager@trajex.io', pw: process.env.DEMO_MANAGER_PW || 'Manager@Default123!', role:'manager' },
+  { name:'Rohith Kumar', email:'staff@trajex.io',   pw: process.env.DEMO_STAFF_PW   || 'Staff@Default123!',   role:'staff'   },
   ];
   for (const u of USERS) {
     const h = await bcrypt.hash(u.pw, 10);

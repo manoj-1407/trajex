@@ -3,9 +3,10 @@
 
 DO $$ BEGIN
   IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'trajex_app') THEN
-    -- IMPORTANT: Change this password in your .env file and ensure it matches the 
-    -- value in DATABASE_URL. Avoid hardcoding passwords in this SQL file.
-    CREATE ROLE trajex_app LOGIN PASSWORD 'REPLACE_WITH_SECURE_PASSWORD';
+    -- IMPORTANT: Change this password immediately. Ensure it matches the 
+    -- value in DATABASE_URL. Avoid hardcoding production passwords.
+    CREATE ROLE trajex_app LOGIN PASSWORD 'change_this_password_before_running';
+    RAISE NOTICE 'TRAJEX_APP role created with placeholder password. Update it before production deployment.';
   END IF;
 END $$;
 
