@@ -64,6 +64,7 @@ export default function App() {
   const location = useLocation();
   const setAuth = useAuthStore(state => state.setAuth);
   const logout = useAuthStore(state => state.logout);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const [isHydrating, setIsHydrating] = React.useState(true);
 
   React.useEffect(() => {
