@@ -59,13 +59,31 @@ async function getStatusBreakdown(businessId, days) {
 async function getTopRiders(businessId, days, limit = 5) {
     const result = await db.queryForTenant(
         businessId,
-        "SELECT u.id, u.name as "fullName", u.email, COUNT(o.id) as deliveries, AVG(EXTRACT(EPOCH FROM (o.updated_at - o.created_at))/60) as avg_minutes, COUNT(CASE WHEN o.status='delivered' THEN 1 END)::float / NULLIF(COUNT(o.id),0) as success_rate, dp.reliability_score FROM users u JOIN delivery_partners dp ON dp.user_id = u.id LEFT JOIN orders o ON o.rider_id = dp.id AND o.created_at >= NOW() - INTERVAL '1 day' * $2 WHERE u.business_id=$1 GROUP BY u.id, u.name, u.email, dp.reliability_score ORDER BY deliveries DESC LIMIT $3",
+        `SELECT 
+            u.id, 
+            u.name AS "fullName", 
+            u.email, 
+            COUNT(o.id) AS deliveries, 
+            AVG(EXTRACT(EPOCH FROM (o.updated_at - o.created_at))/60) AS "avgMinutes", 
+            COUNT(CASE WHEN o.status='delivered' THEN 1 END)::float / NULLIF(COUNT(o.id),0) AS "successRate", 
+            dp.reliability_score AS "reliabilityScore" 
+         FROM users u 
+         JOIN delivery_partners dp ON dp.user_id = u.id 
+         LEFT JOIN orders o ON o.rider_id = dp.id AND o.created_at >= NOW() - INTERVAL '1 day' * $2 
+         WHERE u.business_id=$1 
+         GROUP BY u.id, u.name, u.email, dp.reliability_score 
+         ORDER BY deliveries DESC 
+         LIMIT $3`,
         [businessId, days, limit]
     );
     return result.rows.map(r => ({
-        id: r.id, fullName: r.fullName, email: r.email, deliveries: parseInt(r.deliveries),
-        avgMinutes: parseFloat(r.avg_minutes || 0), successRate: parseFloat(r.success_rate || 0),
-        reliabilityScore: parseFloat(r.reliability_score)
+        id: r.id, 
+        fullName: r.fullName, 
+        email: r.email, 
+        deliveries: parseInt(r.deliveries),
+        avgMinutes: parseFloat(r.avgMinutes || 0), 
+        successRate: parseFloat(r.successRate || 0),
+        reliabilityScore: parseFloat(r.reliabilityScore)
     }));
 }
 

@@ -77,15 +77,35 @@ cp .env.docker.example .env.docker
 npm run docker:up
 ```
 
+## 🌐 Production Deployment
+
+### Backend (Railway)
+1. Set the **Root Directory** to `/` (Repo Root).
+2. The platform will automatically use the root `Dockerfile`.
+3. Configure the following **Environment Variables** in the Railway dashboard:
+   - `NODE_ENV`: `production`
+   - `DATABASE_URL`: Your production Postgres connection string.
+   - `JWT_ACCESS_SECRET`: A long, random string.
+   - `JWT_REFRESH_SECRET`: Another long, random string.
+   - `CORS_ORIGIN`: Your Vercel frontend URL (e.g., `https://trajex.vercel.app`).
+   - `FRONTEND_URL`: Same as `CORS_ORIGIN`.
+
+### Frontend (Vercel)
+1. Set the **Root Directory** to `/` (Repo Root).
+2. Use the following build settings:
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `frontend/dist`
+3. Configure **Environment Variables**:
+   - `VITE_API_URL`: Your Railway backend URL (e.g., `https://trajex-production.up.railway.app`).
+
 ---
 
-## 🧪 Testing State
-
+## 🧪 Testing & Quality
 ```bash
 npm run test:backend
 ```
 > **Status:** 44 Intensive Integration Tests passing across Auth, RLS, CSRF, Replay Attack prevention, and Core Business Logic.
+> **Code Style:** 100% camelCase API contract enforcement.
 
 ## 📄 Credits
 Built by **Manoj Kumar**.
-
