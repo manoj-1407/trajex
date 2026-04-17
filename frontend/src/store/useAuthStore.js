@@ -1,5 +1,11 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+const safeStorage = {
+  getItem: (name) => { try { return localStorage.getItem(name) } catch (e) { return null } },
+  setItem: (name, value) => { try { localStorage.setItem(name, value) } catch (e) {} },
+  removeItem: (name) => { try { localStorage.removeItem(name) } catch (e) {} },
+};
 
 const useAuthStore = create(
   persist(
@@ -14,6 +20,7 @@ const useAuthStore = create(
     }),
     {
       name: 'trajex-auth',
+      storage: createJSONStorage(() => safeStorage),
       partialize: (s) => ({ user: s.user }),
     }
   )

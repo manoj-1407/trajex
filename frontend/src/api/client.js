@@ -39,7 +39,13 @@ api.interceptors.request.use(async (config) => {
   const token = store.getState().token;
   if (token) config.headers.Authorization = `Bearer ${token}`;
 
-  const csrfMatch = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+  let csrfMatch = null;
+  try {
+    csrfMatch = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+  } catch (e) {
+    // Suppress document.cookie blocked access in strict mobile webviews
+  }
+  
   if (csrfMatch && csrfMatch[1]) {
     config.headers['X-CSRF-Token'] = csrfMatch[1];
   }
