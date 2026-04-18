@@ -9,5 +9,7 @@ module.exports = {
     ecmaVersion: 'latest',
   },
   rules: {
+    "no-unused-vars": "off",
+    "no-useless-catch": "off"
   }
 };
