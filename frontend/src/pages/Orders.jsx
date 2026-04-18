@@ -8,7 +8,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import Badge from '../components/ui/Badge';
-import { SkeletonTableRow } from '../components/ui/Skeleton';
+import { SkeletonTableRow, SkeletonCard } from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import Modal from '../components/ui/Modal';
 import { formatTimeAgo, formatDate } from '../utils/format';
