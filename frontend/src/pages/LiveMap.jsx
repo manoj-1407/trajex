@@ -65,10 +65,10 @@ function MovingMarker({ rider, onClick }) {
                <Badge type="rider" status={rider.status} size="sm" />
              </div>
           </div>
-          <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '6px', letterSpacing: '0.05em' }}>Unit Telemetry</div>
+          <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '6px', letterSpacing: '0.05em' }}>Rider Metrics</div>
           <div style={{ padding: '8px', background: 'var(--bg-hover)', borderRadius: '8px', fontSize: '12px' }}>
              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>LOAD</span>
+                <span style={{ color: 'var(--text-secondary)' }}>TASKS</span>
                 <span style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{rider.activeOrders} ACTIVE</span>
              </div>
              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -173,8 +173,8 @@ export default function LiveMap() {
              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--accent-dim)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Compass size={20} /></div>
                 <div>
-                   <h2 style={{ fontSize: '18px', fontWeight: 900, margin: 0, letterSpacing: '-0.02em' }}>Fleet HUD</h2>
-                   <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Fleet Dashboard v1.2</div>
+                   <h2 style={{ fontSize: '18px', fontWeight: 900, margin: 0, letterSpacing: '-0.02em' }}>Fleet Dispatch</h2>
+                   <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Live Logistics Interface</div>
                 </div>
              </div>
              <div style={{ display: 'flex', gap: '8px' }}>
@@ -186,7 +186,7 @@ export default function LiveMap() {
           <div style={{ padding: '20px', display: 'flex', gap: '12px' }}>
              <div style={{ flex: 1, padding: '16px', background: 'var(--bg-hover)', borderRadius: '14px', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '24px', fontWeight: 950, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{activeRiders.length}</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Deployed</div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Riders</div>
              </div>
              <div style={{ flex: 1, padding: '16px', background: 'var(--bg-hover)', borderRadius: '14px', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '24px', fontWeight: 950, color: 'var(--warning)', fontFamily: 'var(--font-mono)' }}>{transitOrders.length}</div>
@@ -205,7 +205,7 @@ export default function LiveMap() {
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: r.status === 'busy' ? 'var(--warning)' : 'var(--success)' }} />
                         <span style={{ fontSize: '13px', fontWeight: 700 }}>{r.name}</span>
                      </div>
-                     <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 900 }}>v1.2.0</span>
+                     <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 900 }}>ACTIVE</span>
                   </motion.div>
                 ))}
              </div>

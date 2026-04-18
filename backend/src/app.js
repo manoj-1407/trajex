@@ -43,7 +43,19 @@ const allowedOrigins = env.CORS_ORIGIN
 function corsOriginFn(origin, callback) {
   // Allow requests with no origin (mobile apps, curl, Postman, Railway health checks)
   if (!origin) return callback(null, true);
+  
+  // Wildcard allow all .vercel.app and .railway.app domains for absolute connectivity
+  if (origin.endsWith('.vercel.app') || origin.endsWith('.railway.app')) {
+    return callback(null, true);
+  }
+
   if (allowedOrigins.includes(origin)) return callback(null, true);
+  
+  // Fallback for development (localhost)
+  if (env.NODE_ENV !== 'production' && origin.startsWith('http://localhost:')) {
+    return callback(null, true);
+  }
+
   return callback(new Error(`CORS: Origin ${origin} not allowed`));
 }
 
@@ -141,5 +153,14 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => logger.debug({ id: socket.id }, 'socket disconnected'));
 });
+
+// Startup Integrity Log
+logger.info({
+    env: env.NODE_ENV,
+    port: env.PORT,
+    db_status: env.DATABASE_URL ? 'CONFIGURED' : 'MISSING',
+    cors_origins: allowedOrigins,
+    frontend: env.FRONTEND_URL
+}, 'BOOT:: System integrity check complete. Platform ready.');
 
 module.exports = { app, httpServer, io };

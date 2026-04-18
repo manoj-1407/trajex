@@ -18,7 +18,7 @@ import Badge from '../components/ui/Badge';
 import EmptyState from '../components/ui/EmptyState';
 import { formatTimeAgo } from '../utils/format';
 
-const HUD_COLORS = {
+const UI_COLORS = {
   accent: '#00f0d8',
   success: '#10b981',
   warning: '#f59e0b',
@@ -28,33 +28,33 @@ const HUD_COLORS = {
 };
 
 const STATUS_MAP = {
-  pending: HUD_COLORS.muted,
-  confirmed: HUD_COLORS.info,
-  assigned: HUD_COLORS.warning,
+  pending: UI_COLORS.muted,
+  confirmed: UI_COLORS.info,
+  assigned: UI_COLORS.warning,
   picked_up: '#a78bfa',
-  in_transit: HUD_COLORS.accent,
-  delivered: HUD_COLORS.success,
-  failed: HUD_COLORS.danger,
+  in_transit: UI_COLORS.accent,
+  delivered: UI_COLORS.success,
+  failed: UI_COLORS.danger,
 };
 
-function PerformanceHUD({ socketStatus, latency }) {
+function ConnectivityStatus({ socketStatus, latency }) {
   return (
     <div className="glass" style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '20px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: socketStatus === 'connected' ? HUD_COLORS.success : HUD_COLORS.danger }} className={socketStatus === 'connected' ? 'pulse' : ''} />
-        SOCKET: {socketStatus}
+        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: socketStatus === 'connected' ? UI_COLORS.success : UI_COLORS.danger }} className={socketStatus === 'connected' ? 'pulse' : ''} />
+        NETWORK: {socketStatus}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         <Activity size={12} /> LATENCY: {latency}ms
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <Cpu size={12} /> ENGINE: V1.2-STABLE
+        <Cpu size={12} /> PLATFORM: v1.0-STABLE
       </div>
     </div>
   );
 }
 
-function TelemetryModule({ icon: Icon, label, value, trend, color, data }) {
+function MetricCard({ icon: Icon, label, value, trend, color, data }) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -69,7 +69,7 @@ function TelemetryModule({ icon: Icon, label, value, trend, color, data }) {
             <Icon size={20} />
           </div>
           {trend && (
-            <div style={{ fontSize: '12px', color: HUD_COLORS.success, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ fontSize: '12px', color: UI_COLORS.success, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Zap size={12} fill="currentColor" /> {trend}
             </div>
           )}
@@ -150,23 +150,17 @@ export default function Dashboard() {
     
     const onOrderUpdate = (data) => {
       setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
-      addToFeed({ 
-        id: Date.now(), 
-        type: 'LOGISTICS', 
-        text: `Order Update: ${data.orderId.substring(0,8)} -> ${data.status.replace('_', ' ').toUpperCase()}`, 
-        icon: Package, 
-        color: HUD_COLORS.accent 
-      });
+      setFeed(prev => [item, ...prev].slice(0, 20));
     };
 
     const onRiderUpdate = (data) => {
       setRiders(prev => prev.map(r => r.id === data.riderId ? { ...r, lastLat: data.lastLat, lastLng: data.lastLng, lastSeenAt: new Date() } : r));
       addToFeed({ 
         id: Date.now(), 
-        type: 'SYNC', 
-        text: `Location Sync: ${data.riderId.substring(0,6)} initialized`, 
+        type: 'LOGISTICS', 
+        text: `Rider Update: ${data.riderId.substring(0,6)} localized`, 
         icon: Globe, 
-        color: HUD_COLORS.info 
+        color: UI_COLORS.info 
       });
     };
 
@@ -181,10 +175,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const logs = [
-      { type: 'NETWORK', text: 'Regional Hub: Hyderabad Sync Complete', icon: Globe, color: HUD_COLORS.accent },
-      { type: 'FLEET', text: 'Node Status: Bengaluru Operational', icon: Activity, color: HUD_COLORS.info },
-      { type: 'SLA', text: 'Market Uptime: 99.98% (India South)', icon: Zap, color: HUD_COLORS.success },
-      { type: 'SECURITY', text: 'Identity Encryption: Active', icon: Shield, color: HUD_COLORS.warning }
+      { type: 'NETWORK', text: 'Regional Hub Sync Complete', icon: Globe, color: UI_COLORS.accent },
+      { type: 'FLEET', text: 'Hub Status: Operational', icon: Activity, color: UI_COLORS.info },
+      { type: 'SLA', text: 'Platform Uptime: 99.98%', icon: Zap, color: UI_COLORS.success },
+      { type: 'SECURITY', text: 'Account Security: Active', icon: Shield, color: UI_COLORS.warning }
     ];
 
     const interval = setInterval(() => {
@@ -224,10 +218,10 @@ export default function Dashboard() {
       <div className="grid-auto" id="dashboard-kpi">
         {loading ? <SkeletonKPI count={4} /> : (
           <>
-            <TelemetryModule icon={Package} label="Total Orders" value={analytics?.orders?.total || 0} trend={orderTrendPct} color={HUD_COLORS.info} data={sparkData} />
-            <TelemetryModule icon={Users} label="Active Riders" value={(analytics?.riders?.byStatus?.available || 0) + (analytics?.riders?.byStatus?.busy || 0)} color={HUD_COLORS.accent} data={sparkData} />
-            <TelemetryModule icon={Zap} label="Delivery Rate" value={`${analytics?.orders?.deliveryRate || 0}%`} trend={orderTrendPct} color={HUD_COLORS.success} data={sparkData} />
-            <TelemetryModule icon={Shield} label="System Security" value="OK" color={HUD_COLORS.warning} data={Array(10).fill({ val: 0 })} />
+            <MetricCard icon={Package} label="Total Orders" value={analytics?.orders?.total || 0} trend={orderTrendPct} color={UI_COLORS.info} data={sparkData} />
+            <MetricCard icon={Users} label="Active Riders" value={(analytics?.riders?.byStatus?.available || 0) + (analytics?.riders?.byStatus?.busy || 0)} color={UI_COLORS.accent} data={sparkData} />
+            <MetricCard icon={Zap} label="Delivery Rate" value={`${analytics?.orders?.deliveryRate || 0}%`} trend={orderTrendPct} color={UI_COLORS.success} data={sparkData} />
+            <MetricCard icon={Shield} label="System Privacy" value="SECURE" color={UI_COLORS.warning} data={Array(10).fill({ val: 0 })} />
           </>
         )}
       </div>
@@ -242,10 +236,10 @@ export default function Dashboard() {
         {/* Main Telemetry Chart */}
         <div className="glass-card glass-stack" style={{ padding: '32px', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Order Volume Tracking</h3>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dispatch Analytics</h3>
             <div style={{ display: 'flex', gap: '16px', fontSize: '11px', fontWeight: 700 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '8px', height: '2px', background: HUD_COLORS.accent }} /> ACTUAL VOLUME</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '8px', height: '2px', background: 'var(--border)', borderTop: '2px dashed #666' }} /> PREDICTED TRENDS</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '8px', height: '2px', background: UI_COLORS.accent }} /> ACTUAL VOLUME</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '8px', height: '2px', background: 'var(--border)', borderTop: '2px dashed #666' }} /> HISTORICAL TRENDS</div>
             </div>
           </div>
           
@@ -302,26 +296,24 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(400px, 100%), 1fr))', gap: '32px', marginBottom: '32px' }}>
          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', border: '1px solid var(--border)' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-               <h3 style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Recent Deployments</h3>
-               <Link to="/orders" style={{ fontSize: '11px', color: HUD_COLORS.accent, fontWeight: 800, textTransform: 'uppercase' }}>LOG_QUEUE →</Link>
+               <h3 style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Recent Orders</h3>
+               <Link to="/orders" style={{ fontSize: '11px', color: UI_COLORS.accent, fontWeight: 800, textTransform: 'uppercase' }}>ORDER_QUEUE →</Link>
             </div>
             <div style={{ flex: 1 }}>
                {orders.slice(0, 5).map(o => (
                   <div key={o.id} style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                      <div>
-                        <div style={{ fontFamily: 'var(--font-mono)', color: HUD_COLORS.accent, fontSize: '11px', fontWeight: 800 }}>UNIT::{o.id.substring(0,8).toUpperCase()}</div>
+                        <div style={{ fontFamily: 'var(--font-mono)', color: UI_COLORS.accent, fontSize: '11px', fontWeight: 800 }}>ID::{o.id.substring(0,8).toUpperCase()}</div>
                         <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{o.customerName}</div>
                      </div>
                      <Badge status={o.status} size="sm" />
                   </div>
                ))}
             </div>
-         </div>
-
-         <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', border: '1px solid var(--border)' }}>
+         </div>          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', border: '1px solid var(--border)' }}>
             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                <h3 style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Fleet Status</h3>
-               <Link to="/riders" style={{ fontSize: '11px', color: HUD_COLORS.accent, fontWeight: 800, textTransform: 'uppercase' }}>MANAGE_FLEET →</Link>
+               <Link to="/riders" style={{ fontSize: '11px', color: UI_COLORS.accent, fontWeight: 800, textTransform: 'uppercase' }}>MANAGE_FLEET →</Link>
             </div>
             <div style={{ flex: 1 }}>
                {riders.filter(r => r.status !== 'offline').slice(0, 5).map(r => (
@@ -329,13 +321,13 @@ export default function Dashboard() {
                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--bg-elevated)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '13px' }}>{r.name.charAt(0)}</div>
                      <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{r.name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{r.activeOrders} ACTIVE_OPS</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{r.activeOrders} ACTIVE_TASKS</div>
                      </div>
-                     <div className="pulse" style={{ width: '6px', height: '6px', borderRadius: '50%', background: r.status === 'busy' ? HUD_COLORS.warning : HUD_COLORS.success }} />
+                     <div className="pulse" style={{ width: '6px', height: '6px', borderRadius: '50%', background: r.status === 'busy' ? UI_COLORS.warning : UI_COLORS.success }} />
                   </div>
                ))}
             </div>
-         </div>
+         </div>div>
       </div>
     </div>
   );

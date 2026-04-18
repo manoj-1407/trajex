@@ -7,26 +7,26 @@ import api from '../api/client';
 const STEPS = [
   {
     targetId: 'nav-dashboard',
-    title: 'Command Center',
-    content: 'Welcome to your Fleet Dashboard. Here you get a real-time overview of your entire logistics operation.',
+    title: 'Operations Overview',
+    content: 'Welcome to your main dashboard. Monitor real-time fleet efficiency and delivery performance at a glance.',
     placement: 'right'
   },
   {
     targetId: 'nav-live-map',
-    title: 'Visual Fleet Tracking',
-    content: 'Watch your riders move in real-time across the terrain. Every ping is a pulse of your business.',
+    title: 'Live Logistics Map',
+    content: 'Watch your riders move in real-time. Track optimized routes and ensure timely delivery drops.',
     placement: 'right'
   },
   {
     targetId: 'nav-orders',
-    title: 'Dispatch Engine',
-    content: 'Manage your workload here. Efficiently assign, track, and optimize every delivery with one click.',
+    title: 'Dispatch Management',
+    content: 'Efficiently assign, track, and manage all outgoing orders from this centralized queue.',
     placement: 'right'
   },
   {
     targetId: 'dashboard-kpi',
-    title: 'Advanced Telemetry',
-    content: 'Deep metrics at a glance. We track SLAs, delivery times, and rider efficiency so you don\'t have to.',
+    title: 'Operational Metrics',
+    content: 'Analyze throughput, delivery times, and rider reliability with our automated reporting cards.',
     placement: 'bottom'
   }
 ];

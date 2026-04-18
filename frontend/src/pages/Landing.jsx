@@ -9,33 +9,19 @@ import {
 import useThemeStore from '../store/useThemeStore';
 import ThemeToggle from '../components/ThemeToggle';
 
-function NebulaBackground() {
+function AmbientBackground() {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
       <motion.div
         animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-          rotate: [0, 90, 0],
+          scale: [1, 1.1, 1],
+          opacity: [0.1, 0.2, 0.1],
         }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         style={{
-          position: 'absolute', top: '-20%', left: '-10%', width: '70%', height: '70%',
+          position: 'absolute', top: '-10%', left: '-5%', width: '60%', height: '60%',
           background: 'radial-gradient(circle, var(--accent) 0%, transparent 70%)',
-          filter: 'blur(100px)', opacity: 0.4
-        }}
-      />
-      <motion.div
-        animate={{
-          scale: [1.2, 1, 1.2],
-          opacity: [0.2, 0.4, 0.2],
-          rotate: [0, -90, 0],
-        }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        style={{
-          position: 'absolute', bottom: '-10%', right: '-10%', width: '60%', height: '60%',
-          background: 'radial-gradient(circle, var(--info) 0%, transparent 70%)',
-          filter: 'blur(100px)', opacity: 0.3
+          filter: 'blur(120px)', opacity: 0.2
         }}
       />
     </div>
@@ -51,7 +37,7 @@ export default function Landing() {
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--text-primary)', minHeight: '100vh', fontFamily: 'var(--font-ui)', transition: 'background 0.5s ease' }}>
       
-      <NebulaBackground />
+      <AmbientBackground />
 
       {/* Navbar */}
       <nav className="glass" style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '80px', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 min(5vw, 80px)', borderBottom: '1px solid var(--border-subtle)' }}>
@@ -103,13 +89,13 @@ export default function Landing() {
             </div>
             
             <h1 style={{ fontSize: 'clamp(40px, 8vw, 84px)', fontWeight: 900, lineHeight: 1, letterSpacing: '-0.05em', marginBottom: '32px' }}>
-              Intelligent Fleet <br/>
-              <span className="text-gradient" style={{ filter: 'drop-shadow(0 0 30px var(--accent-glow))' }}>Management System.</span>
+              Professional Fleet <br/>
+              <span className="text-gradient" style={{ filter: 'drop-shadow(0 0 30px var(--accent-glow))' }}>Logistics Platform.</span>
             </h1>
             
             <p style={{ fontSize: 'clamp(18px, 2vw, 22px)', color: 'var(--text-secondary)', marginBottom: '48px', lineHeight: 1.5, maxWidth: '640px', fontWeight: 450 }}>
-              The high-performance engine for field logistics and delivery tracking. 
-              Real-time synchronization, automated routing, and deep organizational security.
+              The high-performance solution for field logistics and delivery tracking. 
+              Real-time synchronization, automated routing, and enterprise organizational security.
             </p>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
@@ -132,7 +118,7 @@ export default function Landing() {
              <div className="glass-card glass-stack" style={{ padding: '8px', borderRadius: '24px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-lg)', overflow: 'hidden' }}>
                 <img 
                   src="/dashboard_preview.png" 
-                  alt="Trajex HUD" 
+                  alt="Trajex Interface" 
                   style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '18px', filter: theme === 'midnight' ? 'brightness(1.2) contrast(1.1)' : 'none' }} 
                 />
              </div>
@@ -159,8 +145,8 @@ export default function Landing() {
           {[
             { icon: Globe, title: 'Network Distribution', text: 'Optimized routing nodes ensure low-latency data sync for your fleet, across any geography.', color: 'var(--brand)' },
             { icon: ShieldCheck, title: 'Data Sovereignty', text: 'Enterprise-grade security and encrypted audit trails keep your operational data private.', color: 'var(--success)' },
-            { icon: Zap, title: 'Routing Intelligence', text: 'Our assignment engine optimizes field movements in real-time to maximize throughput.', color: 'var(--warning)' },
-            { icon: Map, title: 'Operational HUD', text: 'Precision live tracking with smooth movement pathing and visual trip histories.', color: 'var(--accent)' },
+            { icon: Zap, title: 'Logistics Intelligence', text: 'Our assignment system optimizes field movements in real-time to maximize efficiency.', color: 'var(--warning)' },
+            { icon: Map, title: 'Operational Interface', text: 'Precision live tracking with smooth movement pathing and visual trip histories.', color: 'var(--accent)' },
             { icon: Smartphone, title: 'Rider Interface', text: 'Field teams connect via a high-performance web app. No complex setup required.', color: 'var(--info)' },
             { icon: Share2, title: 'Integrations', text: 'Robust API and webhook support to connect Trajex with your existing business tools.', color: 'var(--danger)' },
           ].map((f, i) => (
@@ -196,7 +182,7 @@ export default function Landing() {
                   <Zap size={28} color="var(--brand)" />
                   <span style={{ fontSize: '24px', fontWeight: 900 }}>Trajex</span>
                </div>
-               <p style={{ fontSize: '15px', color: 'var(--text-secondary)', maxWidth: '320px', lineHeight: 1.6 }}>A high-performance logistics management engine. Secured by RLS, built for reliability.</p>
+               <p style={{ fontSize: '15px', color: 'var(--text-secondary)', maxWidth: '320px', lineHeight: 1.6 }}>A high-performance logistics management platform. Secured by RLS, built for reliability.</p>
             </div>
             <div style={{ display: 'flex', gap: '100px' }}>
                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
