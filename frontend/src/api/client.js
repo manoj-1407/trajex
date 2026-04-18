@@ -43,6 +43,12 @@ function getBaseURL() {
     // Strip trailing slash, always append /api/v1
     return base.replace(/\/$/, '') + '/api/v1';
   }
+  
+  // Nuclear fallback for production environments where env vars might be missing at build time
+  if (import.meta.env.PROD) {
+    return 'https://trajex-production.up.railway.app/api/v1';
+  }
+  
   return '/api/v1';
 }
 
