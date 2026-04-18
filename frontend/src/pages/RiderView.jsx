@@ -77,6 +77,9 @@ export default function RiderView() {
         .leaflet-container { background-color: var(--bg); font-family: var(--font-ui); }
       `}} />
       
+      <style dangerouslySetInnerHTML={{__html: `
+        @media (max-width: 768px) { .riderview-card { bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 8px) !important; } }
+      `}} />
       <div style={{ flex: 1, zIndex: 1, filter: online ? 'none' : 'grayscale(100%) opacity(50%)', transition: 'filter 0.5s' }}>
         <MapContainer center={position || [17.3850, 78.4867]} zoom={15} style={{ width: '100%', height: '100%' }} zoomControl={false}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -86,7 +89,7 @@ export default function RiderView() {
       </div>
 
       {/* Online Toggle Card Over Map */}
-      <div className="glass-strong" style={{ position: 'absolute', bottom: '24px', left: '24px', right: '24px', zIndex: 400, borderRadius: 'var(--radius-xl)', padding: '24px', textAlign: 'center', boxShadow: 'var(--shadow-xl)' }}>
+      <div className="glass-strong riderview-card" style={{ position: 'absolute', bottom: '24px', left: '24px', right: '24px', zIndex: 400, borderRadius: 'var(--radius-xl)', padding: '24px', textAlign: 'center', boxShadow: 'var(--shadow-xl)' }}>
         <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: online ? 'var(--success-dim)' : 'var(--bg-elevated)', border: `2px solid ${online ? 'var(--success)' : 'var(--border)'}`, margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s' }}>
           <div className={online ? 'status-dot pulse' : 'status-dot'} style={{ background: online ? 'var(--success)' : 'var(--text-muted)' }} />
         </div>

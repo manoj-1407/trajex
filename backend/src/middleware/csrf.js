@@ -4,17 +4,17 @@ const env = require('../config/env');
 
 /**
  * Double-submit cookie pattern CSRF protection.
- * We set a CSRF token in a non-httpOnly cookie so the SPA can read it
- * and attach it to the X-CSRF-Token header on state-changing requests.
+ * sameSite='none' + secure=true required for cross-origin (Vercel -> Railway).
+ * sameSite='lax' used in development for local proxy compatibility.
  */
 function csrfTokenGenerate(req, res, next) {
     let token = req.cookies['csrf_token'];
     if (!token) {
         token = crypto.randomBytes(32).toString('hex');
         res.cookie('csrf_token', token, {
-            httpOnly: false, // Frontend reads this to send in header
-            secure: env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            httpOnly: false, // Frontend must read this to send in header
+            secure: env.NODE_ENV === 'production', // Must be true for sameSite:none
+            sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
             path: '/'
         });
     }
@@ -25,7 +25,7 @@ function csrfTokenGenerate(req, res, next) {
 function csrfProtect(req, res, next) {
     if (['GET', 'HEAD', 'OPTIONS'].includes(req.method) || process.env.NODE_ENV === 'test') return next();
 
-    // Excluded routes
+    // Excluded routes that don't need CSRF
     const excluded = [
         '/api/v1/auth/refresh',
         '/api/v1/health'

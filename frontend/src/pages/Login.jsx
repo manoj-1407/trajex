@@ -57,7 +57,7 @@ export function AuthSplitLayout({ children, title, subtitle }) {
         </div>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px, 5vw, 40px)' }}>
         <div style={{ width: '100%', maxWidth: '440px' }}>
           {children}
         </div>
@@ -104,7 +104,7 @@ export default function Login() {
 
   return (
     <AuthSplitLayout title="Fleet Management Portal." subtitle="Enter your credentials to access your organization's delivery dashboard.">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card glass-stack" style={{ padding: '48px', borderRadius: '24px' }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card glass-stack" style={{ padding: 'clamp(24px, 5vw, 48px)', borderRadius: '24px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: 850, marginBottom: '8px', letterSpacing: '-0.03em' }}>Welcome back</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', fontSize: '15px' }}>Sign in to your private workspace.</p>
 

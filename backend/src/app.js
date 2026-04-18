@@ -34,8 +34,28 @@ const app        = express();
 app.set('trust proxy', 1);
 const httpServer = createServer(app);
 
+// Support multiple allowed origins (comma-separated in CORS_ORIGIN env var)
+// e.g. CORS_ORIGIN=https://trajex-xi.vercel.app,https://trajex.vercel.app
+const allowedOrigins = env.CORS_ORIGIN
+  ? env.CORS_ORIGIN.split(',').map(o => o.trim()).filter(Boolean)
+  : [];
+
+function corsOriginFn(origin, callback) {
+  // Allow requests with no origin (mobile apps, curl, Postman, Railway health checks)
+  if (!origin) return callback(null, true);
+  if (allowedOrigins.includes(origin)) return callback(null, true);
+  return callback(new Error(`CORS: Origin ${origin} not allowed`));
+}
+
+const corsOptions = {
+  origin: corsOriginFn,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Request-Id'],
+};
+
 const io = new Server(httpServer, {
-    cors: { origin: env.CORS_ORIGIN, methods: ['GET', 'POST'], credentials: true },
+    cors: { origin: corsOriginFn, methods: ['GET', 'POST'], credentials: true },
 });
 
 const requestId = require('./middleware/requestId');
@@ -52,7 +72,9 @@ app.use(helmet({
     hsts: env.NODE_ENV === 'production' ? { maxAge: 31536000, includeSubDomains: true } : false, 
     referrerPolicy: { policy: 'same-origin' } 
 }));
-app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+app.use(cors(corsOptions));
+// Handle OPTIONS preflight for all routes
+app.options('*', cors(corsOptions));
 app.use(pinoHttp({ logger }));
 app.use(requestId);
 app.use(requireHttps);

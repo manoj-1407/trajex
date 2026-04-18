@@ -41,7 +41,7 @@ export default function Register() {
 
   return (
     <AuthSplitLayout title="Scale Your Operations." subtitle="Set up your fleet workspace and manage your logistical movements with professional precision.">
-      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="glass-card glass-stack" style={{ padding: '40px', borderRadius: '24px' }}>
+      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="glass-card glass-stack" style={{ padding: 'clamp(20px, 5vw, 40px)', borderRadius: '24px' }}>
         <h1 style={{ fontSize: '26px', fontWeight: 850, marginBottom: '8px', letterSpacing: '-0.03em' }}>Create account</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', fontSize: '14px' }}>Set up your organization's workspace.</p>
 
@@ -52,7 +52,7 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))', gap: '12px' }}>
             <Input label="Business Name" value={form.businessName} onChange={e => setForm({...form, businessName: e.target.value})} leftIcon={Building} disabled={loading} placeholder="e.g. Trajex India" />
             <Input label="Full Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} leftIcon={User} disabled={loading} placeholder="Your Name" />
           </div>

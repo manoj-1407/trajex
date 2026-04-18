@@ -5,10 +5,21 @@ import useAuthStore from '../store/useAuthStore';
 const SocketContext = createContext(null);
 
 /**
+ * Get the WebSocket server URL.
+ * In production: connect directly to Railway (WebSocket can't go through Vercel rewrites).
+ * In development: connect to same origin (proxied by Vite).
+ */
+function getSocketURL() {
+  const base = import.meta.env.VITE_API_BASE_URL;
+  if (base) {
+    return base.replace(/\/$/, ''); // e.g. https://trajex-production.up.railway.app
+  }
+  return undefined; // Socket.io defaults to current origin (localhost:5173 in dev)
+}
+
+/**
  * SocketProvider — creates ONE socket connection per authenticated session.
  * All child components share the same socket via useSocket() hook.
- * This prevents the duplicate-connection bug where each component
- * calling useSocket() created its own connection.
  */
 export function SocketProvider({ children }) {
   const { token, user, isAuthenticated } = useAuthStore();
@@ -17,7 +28,6 @@ export function SocketProvider({ children }) {
 
   useEffect(() => {
     if (!isAuthenticated || !token) {
-      // Disconnect any existing socket when auth is lost
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -26,14 +36,16 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    // Don't create a new socket if one already exists and is connected
     if (socketRef.current?.connected) return;
 
-    const s = io({
+    const socketURL = getSocketURL();
+
+    const s = io(socketURL, {
       path: '/socket.io',
       auth: { token },
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 5,
+      withCredentials: true,
     });
 
     s.on('connect', () => {

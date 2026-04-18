@@ -215,7 +215,7 @@ export default function PublicTracking() {
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
            div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
            div[style*="minmax(380px, 1fr)"] { height: 50% !important; border-right: none !important; border-top: 1px solid var(--border) !important; order: 2; }
            div[style*="height: 100%"] { height: 50% !important; order: 1; }

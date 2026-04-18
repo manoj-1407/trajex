@@ -167,8 +167,8 @@ export default function LiveMap() {
       </MapContainer>
 
       {/* Control Overlay */}
-      <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 400, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div className="glass-strong glass-stack" style={{ width: '340px', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--shadow-lg)' }}>
+      <div style={{ position: 'absolute', top: '16px', left: '16px', right: '16px', zIndex: 400, display: 'flex', flexDirection: 'column', gap: '16px', pointerEvents: 'none' }}>
+        <div className="glass-strong glass-stack" style={{ pointerEvents: 'all', width: '340px', maxWidth: 'calc(100vw - 32px)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', overflow: 'hidden', boxShadow: 'var(--shadow-lg)' }}>
           <div style={{ padding: '24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--accent-dim)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Compass size={20} /></div>

@@ -11,7 +11,9 @@ const googleService = require('./google.service');
 const REFRESH_COOKIE = {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    // sameSite:'none' required for cross-origin (Vercel frontend -> Railway backend)
+    // sameSite:'lax' in dev since proxy makes it same-origin
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/api/v1/auth',
 };

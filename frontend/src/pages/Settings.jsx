@@ -117,9 +117,15 @@ export default function Settings() {
     <div className="fade-in-up" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1000px', margin: '0 auto' }}>
       <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>Settings</h1>
 
-      <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }} className="flex-col-mobile">
+      <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }} className="flex-col-mobile settings-layout">
         {/* Left Nav */}
-        <div className="glass-card" style={{ flex: '0 0 220px', position: 'sticky', top: '80px', padding: '12px' }}>
+        <style dangerouslySetInnerHTML={{__html: `
+          @media (max-width: 768px) {
+            .settings-nav { flex: unset !important; width: 100% !important; position: static !important; display: flex !important; flex-direction: row !important; overflow-x: auto !important; padding: 8px !important; gap: 4px !important; }
+            .settings-nav button { flex-shrink: 0 !important; border-left: none !important; border-bottom: 3px solid transparent !important; border-radius: 8px !important; white-space: nowrap; }
+          }
+        `}} />
+        <div className="glass-card settings-nav" style={{ flex: '0 0 220px', position: 'sticky', top: '80px', padding: '12px' }}>
           {tabs.map(t => (
             <button
               key={t.id}

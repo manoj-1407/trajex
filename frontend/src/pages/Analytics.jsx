@@ -172,7 +172,7 @@ export default function Analytics() {
       </div>
 
       {tab === 'delivery' && (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(400px, 100%), 1fr))', gap: '24px' }}>
         <div className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '400px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '24px' }}>Order Volume vs SLA</h3>
           <div style={{ flex: 1, minHeight: 0 }}>
@@ -217,7 +217,7 @@ export default function Analytics() {
       )}
 
       {tab === 'fleet' && (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(400px, 100%), 1fr))', gap: '24px' }}>
         <div className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', height: '400px', gridColumn: '1 / -1' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}><Trophy size={18} color="var(--warning)" /> Top Performers</h3>
           <div style={{ flex: 1, overflowY: 'auto' }}>
