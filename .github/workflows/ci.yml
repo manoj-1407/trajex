@@ -35,11 +35,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
         
-    - name: Install Dependencies
-      run: npm install
-      
     - name: Frontend Build
       run: |
         cd frontend
@@ -49,9 +45,18 @@ jobs:
     - name: Backend Test
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trajex_test
+        JWT_ACCESS_SECRET: test_secret
+        JWT_REFRESH_SECRET: test_refresh_secret
+        CORS_ORIGIN: http://localhost:5173
+        NODE_ENV: test
       run: |
         cd backend
         npm install
+        # Wait for Postgres to be fully ready
+        until pg_isready -h localhost -p 5432; do
+          echo "Waiting for postgres..."
+          sleep 2
+        done
         npm test
 
     - name: Backend Lint

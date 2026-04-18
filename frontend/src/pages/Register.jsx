@@ -61,6 +61,9 @@ export default function Register() {
           
           <div>
             <Input label="Password" type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} leftIcon={Lock} disabled={loading} placeholder="••••••••" />
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '6px', lineHeight: 1.4 }}>
+              Must be 8+ chars with uppercase, lowercase, number, and special character.
+            </p>
             {form.password && (
               <div style={{ display: 'flex', gap: '4px', marginTop: '8px' }}>
                 {[1,2,3,4].map(n => (

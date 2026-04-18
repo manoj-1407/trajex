@@ -14,11 +14,18 @@ const env    = require('./config/env');
 const logger = require('./config/logger');
 
 async function start() {
-    // 1. Verify database connectivity before accepting HTTP traffic
+    // 1. Verify database connectivity and run migrations
     try {
         await testConnection();
+        if (env.NODE_ENV === 'production' || process.env.RUN_MIGRATIONS === 'true') {
+            logger.info('Running database migrations...');
+            const { execSync } = require('child_process');
+            // This assumes node-pg-migrate is in the same directory/context
+            execSync('npm run migrate:up', { stdio: 'inherit' });
+            logger.info('Migrations completed successfully.');
+        }
     } catch (err) {
-        logger.error({ err }, 'DATABASE_UNAVAILABLE: Operating in high-resilience limited mode.');
+        logger.error({ err }, 'DATABASE_INIT_FAILURE: Schema may be out of sync.');
     }
     
     // 2. Start the HTTP server on the configured port
