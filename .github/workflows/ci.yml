@@ -50,6 +50,7 @@ jobs:
         CORS_ORIGIN: http://localhost:5173
         NODE_ENV: test
       run: |
+        sudo apt-get update && sudo apt-get install -y postgresql-client
         cd backend
         npm install
         # Wait for Postgres to be fully ready

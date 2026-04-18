@@ -29,6 +29,8 @@ function csrfProtect(req, res, next) {
     // Excluded routes that don't need CSRF
     const excluded = [
         '/api/v1/auth/refresh',
+        '/api/v1/auth/login',
+        '/api/v1/auth/register',
         '/api/v1/health'
     ];
     if (excluded.some(p => req.path === p)) return next();
