@@ -18,6 +18,7 @@ function csrfTokenGenerate(req, res, next) {
             path: '/'
         });
     }
+    res.setHeader('X-CSRF-Token', token);
     req.csrfToken = token;
     next();
 }

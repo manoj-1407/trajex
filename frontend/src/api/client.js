@@ -52,19 +52,25 @@ const api = axios.create({
   timeout: 15000,
 });
 
+let inMemoryCsrf = null;
+
 api.interceptors.request.use(async (config) => {
   const store = await getAuthStore();
   const token = store.getState().token;
   if (token) config.headers.Authorization = `Bearer ${token}`;
 
-  // Read CSRF token from cookie (set by backend on first GET request)
-  try {
-    const csrfMatch = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
-    if (csrfMatch && csrfMatch[1]) {
-      config.headers['X-CSRF-Token'] = csrfMatch[1];
+  // Read CSRF token from memory or cookie fallback
+  if (inMemoryCsrf) {
+    config.headers['X-CSRF-Token'] = inMemoryCsrf;
+  } else {
+    try {
+      const csrfMatch = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+      if (csrfMatch && csrfMatch[1]) {
+        config.headers['X-CSRF-Token'] = csrfMatch[1];
+      }
+    } catch (e) {
+      // Suppress
     }
-  } catch (e) {
-    // Suppress in strict webview environments
   }
 
   return config;
@@ -75,6 +81,9 @@ let queue = [];
 
 api.interceptors.response.use(
   (res) => {
+    if (res.headers['x-csrf-token']) {
+      inMemoryCsrf = res.headers['x-csrf-token'];
+    }
     // Auto-transform all response data from snake_case to camelCase
     if (res.data) {
       res.data = toCamel(res.data);
@@ -82,6 +91,10 @@ api.interceptors.response.use(
     return res;
   },
   async (err) => {
+    if (err.response?.headers?.['x-csrf-token']) {
+      inMemoryCsrf = err.response.headers['x-csrf-token'];
+    }
+
     const original = err.config;
     if (err.response?.status === 401 && !original._retry && !original.url?.includes('/auth/refresh')) {
       if (isRefreshing) {
@@ -94,7 +107,11 @@ api.interceptors.response.use(
       original._retry = true;
       isRefreshing = true;
       try {
-        const { data } = await axios.post(getBaseURL() + '/auth/refresh', {}, { withCredentials: true });
+        const refreshRes = await axios.post(getBaseURL() + '/auth/refresh', {}, { withCredentials: true });
+        if (refreshRes.headers['x-csrf-token']) {
+          inMemoryCsrf = refreshRes.headers['x-csrf-token'];
+        }
+        const { data } = refreshRes;
         const store = await getAuthStore();
         store.getState().setToken(data.accessToken);
         queue.forEach((p) => p.resolve(data.accessToken));

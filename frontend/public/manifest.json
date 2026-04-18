@@ -2,7 +2,7 @@
   "name": "Trajex Mission Control",
   "short_name": "Trajex",
   "description": "Enterprise-grade logistics and fleet intelligence platform",
-  "start_url": "/dashboard",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#07070f",
   "theme_color": "#00e5cc",
